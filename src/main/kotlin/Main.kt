@@ -28,7 +28,8 @@ fun main(args: Array<String>) {
     val stream = File(lslPath).inputStream()
     val parsed = parser.parse(stream)
 
-    val generatedCodeFiles = Generator().generateCode(parsed)
+    val codeGenerator = Generator()
+    val generatedCodeFiles = codeGenerator.generateCode(parsed)
     targetDir.deleteRecursively()
     targetDir.mkdirs()
 
@@ -48,10 +49,10 @@ fun main(args: Array<String>) {
     saveGeneratedCodeToFile(generatedCodeFiles, saveToFile = tmpDir)
     compileMockCode(codeFromDir = tmpDir, generatedFileNames = generatedCodeFiles.keys.toList(), targetDir)
 
-    println("code was instrumented")
-    println("running KEX..")
+    println("the code was instrumented")
+    println("running KEX...")
     runKex(kexJarPath, classPath = targetDir.absolutePath, tmpDir, subject)
-    processKexResult(File(tmpDir.absolutePath + "/" + "defect.json"))
+    processKexResult(File(tmpDir.absolutePath + "/" + "defect.json"), codeGenerator)
 }
 
 private fun unzipLibToPath(lib: File, target: File) {
@@ -129,13 +130,16 @@ private fun runKex(kexPath: String, classPath: String, tmpDir: File, subject: St
     kexProcess.printOutput()
 }
 
-private fun processKexResult(defectFile: File) {
+private fun processKexResult(defectFile: File, codeGenerator: Generator) {
     val gson = Gson()
     val defectsArrayType = (object : TypeToken<Array<Defect>>() {}).type
     val report = gson.fromJson<Array<Defect>>(defectFile.readText(), defectsArrayType)
     for (defect in report) {
         if (defect.type != "ASSERT") continue
-        println(defect.testFile)
+        val description = codeGenerator.errorIdMap[defect.id] ?: "unknown wrong shift"
+        println("Error on ${defect.location.`package`.name}/${defect.location.file}:${defect.location.line}:")
+        println(description)
+        println("Case on ${defect.testFile}:${defect.testCaseName}")
     }
 }
 

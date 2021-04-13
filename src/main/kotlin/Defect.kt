@@ -1,5 +1,6 @@
 data class Defect (
     val location: Location,
+    val id: String?,
     val testCaseName: String,
     val testFile: String,
     val type: String

@@ -5,6 +5,8 @@ import ru.spbstu.insys.libsl.parser.*
 class Generator {
     private val functions = mutableMapOf<String, MutableList<FunctionDecl>>()
     private val types = mutableMapOf<String, String>()
+    private var assertionId = 0
+    val errorIdMap = mutableMapOf<String, String>()
 
     fun generateCode(library: LibraryDecl): Map<String, String> {
         for (function in library.functions) {
@@ -118,7 +120,10 @@ class Generator {
                     append("    } else ")
                 }
                 appendLine("{")
-                appendLineWithIndent("Intrinsics.kexAssert(false);", indent = 8)
+                val assertionIdName = "id${assertionId++}"
+                val assertionDescription = "wrong shift on call function $name"
+                errorIdMap[assertionIdName] = assertionDescription
+                appendLineWithIndent("Intrinsics.kexAssert(\"$assertionIdName\", false);", indent = 8)
                 appendLineWithIndent("}", indent = 4)
             }
             appendLine("}")
