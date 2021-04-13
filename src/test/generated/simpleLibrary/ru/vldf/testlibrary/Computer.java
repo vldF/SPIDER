@@ -1,7 +1,9 @@
 package ru.vldf.testlibrary;
 
+import org.jetbrains.research.kex.Intrinsics;
+
 public class Computer {
-    private ru.vldf.testlibrary.Memory VARIABLE$memory;
+    private Memory VARIABLE$memory;
     int state = 0;
 
     final static int STATE$DOWNED = 0;
@@ -13,7 +15,7 @@ public class Computer {
         if (state == STATE$DOWNED) {
             state = STATE$BOOTED;
         } else {
-            throw new IllegalStateException("Wrong state");
+            Intrinsics.kexAssert(false);
         }
     }
 
@@ -21,7 +23,7 @@ public class Computer {
         if (state == STATE$BOOTED) {
             state = STATE$OSSELECTED;
         } else {
-            throw new IllegalStateException("Wrong state");
+            Intrinsics.kexAssert(false);
         }
     }
 
@@ -29,7 +31,7 @@ public class Computer {
         if (state == STATE$OSSELECTED) {
             state = STATE$OSLOADED;
         } else {
-            throw new IllegalStateException("Wrong state");
+            Intrinsics.kexAssert(false);
         }
     }
 
@@ -37,13 +39,13 @@ public class Computer {
         if (state == STATE$OSLOADED) {
             state = STATE$DOWNED;
         } else {
-            throw new IllegalStateException("Wrong state");
+            Intrinsics.kexAssert(false);
         }
     }
 
     void addMemory() {
         VARIABLE$memory = new Memory();
-        VARIABLE$memory.state = memory.STATE$S;
+        VARIABLE$memory.state = Memory.STATE$CLOSE;
     }
 
 }

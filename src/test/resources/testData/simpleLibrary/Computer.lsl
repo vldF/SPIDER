@@ -32,7 +32,7 @@ fun Computer.loadOS();
 fun Computer.shutdown();
 
 fun Computer.addMemory() {
-    memory = new Memory(S);
+    memory = new Memory(Close);
 } // todo: add another one automaton
 
 automaton Memory {

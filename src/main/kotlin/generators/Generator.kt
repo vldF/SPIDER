@@ -50,10 +50,12 @@ class Generator {
 
             appendLine("package $javaPackageName;") // todo: get pkg parameter from LibSL
             appendLine()
+            appendLine("import org.jetbrains.research.kex.Intrinsics;")
+            appendLine()
             appendLine("public class ${automaton.name} {")
             subAutomatons.forEach { variable ->
                 appendLineWithIndent(
-                    "private ${variable.type.toSemanticType} ${variable.name.automatonVariableName};",
+                    "private ${variable.type.toSemanticType.removePrefix("$javaPackageName.")} ${variable.name.automatonVariableName};",
                     indent = 4
                 )
             }
@@ -99,7 +101,7 @@ class Generator {
                     indent = 4
                 )
                 appendLineWithIndent(
-                    "${assignment.name.automatonVariableName}.state = ${assignment.name}.${assignment.calleeArguments.first().stateName};",
+                    "${assignment.name.automatonVariableName}.state = ${assignment.name.automatonVariableName}.${assignment.calleeArguments.first().stateName};",
                     indent = 4
                 )
             }
@@ -116,7 +118,7 @@ class Generator {
                     append("    } else ")
                 }
                 appendLine("{")
-                appendLineWithIndent("throw new IllegalStateException(\"Wrong state\");", indent = 8)
+                appendLineWithIndent("Intrinsics.kexAssert(false);", indent = 8)
                 appendLineWithIndent("}", indent = 4)
             }
             appendLine("}")

@@ -1,5 +1,7 @@
 package ru.vldf.testlibrary;
 
+import org.jetbrains.research.kex.Intrinsics;
+
 public class Memory {
     int state = 0;
 
@@ -12,15 +14,15 @@ public class Memory {
         } else if (state == STATE$OPEN) {
             state = STATE$CLOSE;
         } else {
-            throw new IllegalStateException("Wrong state");
+            Intrinsics.kexAssert(true);
         }
     }
 
-    void setOS(ru.vldf.testlibrary.OS os) {
+    void setOS(OS os) {
         if (state == STATE$OPEN) {
             state = STATE$OPEN;
         } else {
-            throw new IllegalStateException("Wrong state");
+            Intrinsics.kexAssert(true);
         }
     }
 

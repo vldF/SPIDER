@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.FileInputStream
+import java.util.*
 
 plugins {
     kotlin("jvm") version "1.4.31"
@@ -6,10 +8,22 @@ plugins {
 
 group = "me.vldf"
 version = "1.0-SNAPSHOT"
+val githubProperties = Properties()
+githubProperties.load(FileInputStream(rootProject.file("github.properties")))
 
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
+
+    maven {
+        name = "github-vorpal-research-kotlin-maven"
+        url = uri("https://maven.pkg.github.com/vorpal-research/kotlin-maven")
+        credentials {
+            username =  githubProperties["gpr.usr"] as String
+            password = githubProperties["gpr.key"] as String
+        }
+    }
+    maven("https://kotlin.bintray.com/kotlinx")
 }
 
 dependencies {
@@ -17,6 +31,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
     implementation("com.github.vldF:LibSLParser:ed40ee168f")
+    implementation("org.jetbrains.research:kex-intrinsics:0.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.test {
@@ -25,4 +42,12 @@ tasks.test {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
 }
