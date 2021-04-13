@@ -23,7 +23,7 @@ class Generator {
             for (automaton in library.automata) {
                 val javaPackage = automaton.javaPackage.name
                 val packageLikeFilePath = javaPackage.replace(".", "/")
-                val fileName = "$packageLikeFilePath/${automaton.name}" // todo: get pkg parameter from LibSL
+                val fileName = "$packageLikeFilePath/${automaton.name}"
                 result[fileName] = generateAutomaton(automaton)
             }
 
@@ -48,7 +48,7 @@ class Generator {
             val javaPackageName = automaton.javaPackage.name
             val subAutomatons = automaton.statements.filterIsInstance<AutomatonVariableStatement>()
 
-            appendLine("package $javaPackageName;") // todo: get pkg parameter from LibSL
+            appendLine("package $javaPackageName;")
             appendLine()
             appendLine("import org.jetbrains.research.kex.Intrinsics;")
             appendLine()
