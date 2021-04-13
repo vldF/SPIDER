@@ -34,6 +34,7 @@ dependencies {
     implementation("org.jetbrains.research:kex-intrinsics:0.0.1")
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
     implementation(kotlin("stdlib-jdk8"))
+    implementation("com.google.code.gson:gson:2.8.6")
 }
 
 tasks.test {
