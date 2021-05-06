@@ -1,32 +1,17 @@
 package ru.vldf.testlibrary;
 
-import org.jetbrains.research.kex.Intrinsics;
-
-public class Memory {
-    int state = 0;
-
-    final static int STATE$CLOSE = 0;
-    final static int STATE$OPEN = 1;
+class Memory {
+    SPIDER$SHIFTS SHIFTS_MANAGER = new SPIDER$SHIFTS();
 
     void open() {
-        if (state == STATE$CLOSE) {
-            state = STATE$OPEN;
-        } else if (state == STATE$OPEN) {
-            state = STATE$CLOSE;
-        } else {
-            Intrinsics.kexAssert(true);
-        }
+        SHIFTS_MANAGER.transitionMemoryCallOpen();
     }
 
     void setOS(OS os) {
-        if (state == STATE$OPEN) {
-            state = STATE$OPEN;
-        } else {
-            Intrinsics.kexAssert(true);
-        }
+        SHIFTS_MANAGER.transitionMemoryCallSetOS();
     }
 
     void close() {
+        SHIFTS_MANAGER.transitionMemoryCallClose();
     }
-
 }

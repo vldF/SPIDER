@@ -3,7 +3,7 @@ import java.io.FileInputStream
 import java.util.*
 
 plugins {
-    kotlin("jvm") version "1.4.31"
+    kotlin("jvm") version "1.4.32"
 }
 
 group = "me.vldf"
@@ -24,6 +24,7 @@ repositories {
         }
     }
     maven("https://kotlin.bintray.com/kotlinx")
+    jcenter()
 }
 
 dependencies {
@@ -35,6 +36,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
     implementation(kotlin("stdlib-jdk8"))
     implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.hendraanggrian:javapoet-ktx:0.8")
 }
 
 tasks.test {

@@ -1,6 +1,7 @@
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import generators.Generator
+import generators.descriptors.FileDescriptor
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.required
@@ -72,7 +73,7 @@ private fun copyLibFiles(libPath: File, target: File) {
     libPath.copyRecursively(target)
 }
 
-private fun saveGeneratedCodeToFile(generated: Map<String, String>, saveToFile: File) {
+private fun saveGeneratedCodeToFile(generated: Map<FileDescriptor, String>, saveToFile: File) {
     for ((fileName, code) in generated) {
         val file = File(saveToFile.absolutePath + "/" + fileName + ".java")
         file.parentFile.mkdirs()
@@ -80,7 +81,7 @@ private fun saveGeneratedCodeToFile(generated: Map<String, String>, saveToFile: 
     }
 }
 
-private fun compileMockCode(codeFromDir: File, generatedFileNames: List<String>, target: File) {
+private fun compileMockCode(codeFromDir: File, generatedFileNames: List<FileDescriptor>, target: File) {
     deleteFilesThatNamesEqualsWithGenerated(generatedFileNames, target)
     File(codeFromDir.absolutePath + "/" + "@sources.txt").writeText(generatedFileNames.joinToString("\n") { "${codeFromDir.absolutePath}/$it.java" })
     val javacArgs = arrayOf(
@@ -99,9 +100,9 @@ private fun compileMockCode(codeFromDir: File, generatedFileNames: List<String>,
     javacProcess.printOutput()
 }
 
-private fun deleteFilesThatNamesEqualsWithGenerated(fileNames: List<String>, target: File) {
+private fun deleteFilesThatNamesEqualsWithGenerated(fileNames: List<FileDescriptor>, target: File) {
     for (name in fileNames) {
-        File(target.absolutePath + "/" + name + ".class").delete()
+        File(target.absolutePath + "/" + name.name + ".class").delete()
     }
 }
 
