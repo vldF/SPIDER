@@ -8,7 +8,7 @@ data class FileDescriptor (
     val fullPath: String
         get() = "$path/$name"
     val fullPathWithoutExtension: String
-        get() = "$path/$nameWithoutExtension"
+        get() = "$path$nameWithoutExtension"
     val pathWithSlash: String
         get() = if (path.endsWith("/") || path.endsWith("\\")) path else "$path/"
     val name: String

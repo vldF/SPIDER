@@ -3,9 +3,11 @@ package generators
 import com.hendraanggrian.javapoet.buildJavaFile
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
-import exceptions.UnknownAutomatonName
 import generators.descriptors.FileDescriptor
-import ru.spbstu.insys.libsl.parser.*
+import ru.spbstu.insys.libsl.parser.Automaton
+import ru.spbstu.insys.libsl.parser.AutomatonVariableStatement
+import ru.spbstu.insys.libsl.parser.FunctionDecl
+import ru.spbstu.insys.libsl.parser.LibraryDecl
 import javax.lang.model.element.Modifier
 import kotlin.collections.set
 
@@ -34,7 +36,7 @@ class Generator {
         val result = mutableMapOf<FileDescriptor, String>()
         val shiftsObjectName = "SPIDER\$SHIFTS"
         val shiftsFileDescriptor = FileDescriptor(
-            path = "/",
+            path = "",
             nameWithoutExtension = shiftsObjectName,
             extension = "java"
         )
@@ -42,7 +44,7 @@ class Generator {
 
         for (automaton in library.automata) {
             val javaPackage = automaton.javaPackage.name
-            val packageLikeFilePath = javaPackage.replace(".", "/")
+            val packageLikeFilePath = javaPackage.replace(".", "/") + "/"
             val fileDescriptor = FileDescriptor(
                 path = packageLikeFilePath,
                 nameWithoutExtension = automaton.name.typeName,
