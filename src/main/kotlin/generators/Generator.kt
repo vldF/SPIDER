@@ -13,7 +13,7 @@ import kotlin.collections.set
 
 class Generator {
     private val functions = mutableMapOf<String, MutableList<FunctionDecl>>()
-    private val types = mutableMapOf<String, String>()
+    private val typesAliases = mutableMapOf<String, String>()
     private var assertionId = 0
     private val statesMap = mutableMapOf<String, Int>()
     val errorIdMap = mutableMapOf<String, String>()
@@ -28,7 +28,7 @@ class Generator {
         }
 
         for (type in library.types) {
-            types[type.semanticType.typeName] = type.codeType.typeName
+            typesAliases[type.semanticType.typeName] = type.codeType.typeName
         }
 
         val allStates = getAllStates(library)
@@ -36,7 +36,7 @@ class Generator {
         val result = mutableMapOf<FileDescriptor, String>()
         val shiftsObjectName = "SPIDER\$SHIFTS"
         val shiftsFileDescriptor = FileDescriptor(
-            path = "",
+            path = "spider/",
             nameWithoutExtension = shiftsObjectName,
             extension = "java"
         )
@@ -64,22 +64,26 @@ class Generator {
     }
 
     @Suppress("NAME_SHADOWING")
-    private fun generateShiftsObject(automatons: List<Automaton>, allStates: List<String>): String {
-        return buildJavaFile("") {
+    private fun generateShiftsObject(automata: List<Automaton>, allStates: List<String>): String {
+        return buildJavaFile("spider") {
             indentSize = 4
             addClass("SPIDER\$SHIFTS") {
+                addModifiers(Modifier.PUBLIC)
                 for ((stateIndex, state) in allStates.withIndex()) {
-                    fields.add(TypeName.INT, state, Modifier.FINAL,Modifier.PRIVATE) {
+                    // костыль с replace из-за javapoet
+                    fields.add(TypeName.INT, state.replace("\$\$", "\$"), Modifier.FINAL,Modifier.PRIVATE) {
                         initializer((stateIndex).toString())
                     }
                     statesMap[state] = stateIndex
                 }
 
-                addModifiers(Modifier.PUBLIC)
-                for (automaton in automatons) {
+                for (automaton in automata) {
                     val stateFieldName = getAutomatonStateName(automaton.name.toString())
-                    fields.add(TypeName.INT, stateFieldName, Modifier.PUBLIC) {
-                        val defaultStateName = automaton.states.firstOrNull()?.name?.getStateName(automaton) ?: "0"
+                    fields.add(TypeName.INT, stateFieldName.replace("\$\$", "\$"), Modifier.PUBLIC) {
+                        val defaultStateName = automaton.states.firstOrNull()
+                            ?.name
+                            ?.getStateName(automaton)
+                            ?: "0"
                         initializer(defaultStateName)
                     }
                     
@@ -87,18 +91,21 @@ class Generator {
                         val methodName = method.getTransitionFunctionName(automaton)
 
                         methods.add(methodName) {
+                            addModifiers(Modifier.PUBLIC)
                             returns = TypeName.VOID
 
                             val shiftsMap = automaton.shifts.filter { it.functions.contains(method.name) }.map { it.from to it.to }
                             if (shiftsMap.isNotEmpty()) {
 
                                 val (from, to) = shiftsMap.first()
-                                append("if ($stateFieldName == ${from.getStateName(automaton)})\n")
-                                append("    $stateFieldName = ${to.getStateName(automaton)};\n")
+                                append("if ($stateFieldName == ${from.getStateName(automaton)}) {\n")
+                                if (to != "self") {
+                                    append("    $stateFieldName = ${to.getStateName(automaton)};\n")
+                                }
                                 append("}")
 
                                 for ((from, to) in shiftsMap.subList(1, shiftsMap.size)) {
-                                    append(" else if ($stateFieldName == ${from.getStateName(automaton)})\n")
+                                    append(" else if ($stateFieldName == ${from.getStateName(automaton)}) {\n")
                                     append("    $stateFieldName = ${to.getStateName(automaton)};\n")
                                     append("}")
                                 }
@@ -140,8 +147,8 @@ class Generator {
             addClass(automaton.name.typeName) {
                 val variables = automaton.statements.filterIsInstance<AutomatonVariableStatement>()
 
-                fields.add(ClassName.get("", "SPIDER\$SHIFTS"), "SHIFTS_MANAGER") {
-                    initializer("new SPIDER\$\$SHIFTS()")
+                fields.add(ClassName.get("spider", "SPIDER\$SHIFTS"), "SHIFTS_MANAGER") {
+                    initializer("new spider.SPIDER\$\$SHIFTS()")
                 }
 
                 variables.forEach { variable ->
@@ -159,7 +166,7 @@ class Generator {
 
                         parameters {
                             method.args.forEach { arg ->
-                                val argType = ClassName.get("", arg.type.typeName)
+                                val argType = ClassName.get("", typesAliases[arg.type.typeName])
                                 this.add(argType, arg.name)
                             }
                         }

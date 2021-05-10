@@ -23,6 +23,10 @@ automaton Computer {
     shift OSLoaded -> Downed(shutdown);
 }
 
+fun Computer.Computer(): Computer {
+    result = new Computer(Downed);
+}
+
 fun Computer.boot();
 
 fun Computer.selectOS(osName: OSName);

@@ -18,7 +18,7 @@ private const val kexJarPath = "/home/vldf/IdeaProjects/kex/kex-runner/target/ke
 private const val kexBaseDir = "/home/vldf/IdeaProjects/kex/"
 
 fun main(args: Array<String>) {
-    val argParser = ArgParser("libsl analyzer")
+    val argParser = ArgParser("SPecification Based Integration Defect Revealer")
     val lslPath by argParser.option(ArgType.String, "lsl", "i", "lsl file path").required()
     val jarPath by argParser.option(ArgType.String, "libJar", "j", "library jar file path")
     val libraryDirPath by argParser.option(ArgType.String, "libDir", "d", "library dir path")
@@ -74,8 +74,8 @@ private fun copyLibFiles(libPath: File, target: File) {
 }
 
 private fun saveGeneratedCodeToFile(generated: Map<FileDescriptor, String>, saveToFile: File) {
-    for ((fileName, code) in generated) {
-        val file = File(saveToFile.absolutePath + "/" + fileName + ".java")
+    for ((fileDescriptor, code) in generated) {
+        val file = File(saveToFile.absolutePath + "/" + fileDescriptor.fullPath)
         file.parentFile.mkdirs()
         file.writeText(code)
     }
@@ -83,7 +83,7 @@ private fun saveGeneratedCodeToFile(generated: Map<FileDescriptor, String>, save
 
 private fun compileMockCode(codeFromDir: File, generatedFileNames: List<FileDescriptor>, target: File) {
     deleteFilesThatNamesEqualsWithGenerated(generatedFileNames, target)
-    File(codeFromDir.absolutePath + "/" + "@sources.txt").writeText(generatedFileNames.joinToString("\n") { "${codeFromDir.absolutePath}/$it.java" })
+    File(codeFromDir.absolutePath + "/" + "@sources.txt").writeText(generatedFileNames.joinToString("\n") { "${codeFromDir.absolutePath}/${it.fullPath}" })
     val javacArgs = arrayOf(
         "${javaPath}javac",
         "-cp",
@@ -100,9 +100,9 @@ private fun compileMockCode(codeFromDir: File, generatedFileNames: List<FileDesc
     javacProcess.printOutput()
 }
 
-private fun deleteFilesThatNamesEqualsWithGenerated(fileNames: List<FileDescriptor>, target: File) {
-    for (name in fileNames) {
-        File(target.absolutePath + "/" + name.name + ".class").delete()
+private fun deleteFilesThatNamesEqualsWithGenerated(fileDescriptors: List<FileDescriptor>, target: File) {
+    for (descriptor in fileDescriptors) {
+        File(target.absolutePath + "/" + descriptor.fullPath).delete()
     }
 }
 
