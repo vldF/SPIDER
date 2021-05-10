@@ -1,13 +1,15 @@
 package ru.vldf.testlibrary;
 
+import spider.SPIDER$SHIFTS;
+
 class Memory {
-    SPIDER$SHIFTS SHIFTS_MANAGER = new SPIDER$SHIFTS();
+    SPIDER$SHIFTS SHIFTS_MANAGER = new spider.SPIDER$SHIFTS();
 
     void open() {
         SHIFTS_MANAGER.transitionMemoryCallOpen();
     }
 
-    void setOS(OS os) {
+    void setOS(ru.vldf.testlibrary.OS os) {
         SHIFTS_MANAGER.transitionMemoryCallSetOS();
     }
 

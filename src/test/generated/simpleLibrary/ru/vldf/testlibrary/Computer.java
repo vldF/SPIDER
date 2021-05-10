@@ -1,15 +1,23 @@
 package ru.vldf.testlibrary;
 
+import spider.SPIDER$SHIFTS;
+
 class Computer {
-    SPIDER$SHIFTS SHIFTS_MANAGER = new SPIDER$SHIFTS();
+    SPIDER$SHIFTS SHIFTS_MANAGER = new spider.SPIDER$SHIFTS();
 
     Memory memory;
+
+    Computer Computer() {
+        SHIFTS_MANAGER.transitionComputerCallComputer();
+        result = new Computer();
+        result.SHIFTS_MANAGER.STATE$COMPUTER = 0;
+    }
 
     void boot() {
         SHIFTS_MANAGER.transitionComputerCallBoot();
     }
 
-    void selectOS(OSName osName) {
+    void selectOS(String osName) {
         SHIFTS_MANAGER.transitionComputerCallSelectOS();
     }
 

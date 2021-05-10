@@ -71,7 +71,11 @@ fun wipeTestDataAndGenerateAllFiles(dirPath: String) {
     val stream = lslFile.inputStream()
     val parsed = parser.parse(stream)
 
-    val generated = Generator().generateCode(parsed)
+    val generated = Generator()
+        .generateCode(parsed)
+        .entries
+        .map { it.key.fullPathWithoutExtension to it.value }
+        .toMap()
 
     for ((path, code) in generated) {
         val codeFile = File("$basePath$testName/$path.java")

@@ -18,6 +18,10 @@ class Generator {
     private val statesMap = mutableMapOf<String, Int>()
     val errorIdMap = mutableMapOf<String, String>()
 
+    private val shiftsObjectName = "SPIDER\$SHIFTS"
+    private val kexIntrinsicsClassName = ClassName.get("org.jetbrains.research.kex", "Intrinsics")
+    private val spiderClassName = ClassName.get("spider", "SPIDER\$SHIFTS")
+
     fun generateCode(library: LibraryDecl): Map<FileDescriptor, String> {
         for (function in library.functions) {
             val klass = function.entity.type.typeName
@@ -31,10 +35,13 @@ class Generator {
             typesAliases[type.semanticType.typeName] = type.codeType.typeName
         }
 
-        val allStates = getAllStates(library)
+        val allStates = library.automata.flatMap { automaton ->
+            automaton.states.map { state ->
+                state.name.getStateName(automaton)
+            }
+        }
 
         val result = mutableMapOf<FileDescriptor, String>()
-        val shiftsObjectName = "SPIDER\$SHIFTS"
         val shiftsFileDescriptor = FileDescriptor(
             path = "spider/",
             nameWithoutExtension = shiftsObjectName,
@@ -50,28 +57,45 @@ class Generator {
                 nameWithoutExtension = automaton.name.typeName,
                 "java"
             )
-            result[fileDescriptor] = generateAutomaton(automaton, library)
+            result[fileDescriptor] = generateAutomaton(automaton)
         }
-
 
         return result
     }
 
-    private fun getAllStates(library: LibraryDecl) = library.automata.flatMap { automaton ->
-        automaton.states.map {
-                state -> state.name.getStateName(automaton)
+    /*
+        package spider;
+
+        import org.jetbrains.research.kex.Intrinsics;
+
+        public class SPIDER$SHIFTS {
+            private final int STATE$CONST$Automaton1$State1 = 0;
+
+            private final int STATE$CONST$Automaton1$State2 = 1;
+
+            private final int STATE$CONST$Automaton2$State1 = 2;
+
+            private final int STATE$CONST$Automaton2$State2 = 3;
+
+            ...
+
+            public int STATE$AUTOMATON1 = STATE$CONST$Automaton1$State1;
+
+            public int STATE$AUTOMATON2 = STATE$CONST$Automaton2$State1;
+
+            TRANSITION_FUNCTIONS
         }
-    }
+     */
 
     @Suppress("NAME_SHADOWING")
     private fun generateShiftsObject(automata: List<Automaton>, allStates: List<String>): String {
         return buildJavaFile("spider") {
             indentSize = 4
-            addClass("SPIDER\$SHIFTS") {
+            addClass(shiftsObjectName) {
                 addModifiers(Modifier.PUBLIC)
                 for ((stateIndex, state) in allStates.withIndex()) {
-                    // костыль с replace из-за javapoet
-                    fields.add(TypeName.INT, state.replace("\$\$", "\$"), Modifier.FINAL,Modifier.PRIVATE) {
+                    // state.withoutDoubleDollar is used due strange behaviour of javapoet-ktx
+                    fields.add(TypeName.INT, state.withoutDoubleDollar, Modifier.FINAL,Modifier.PRIVATE) {
                         initializer((stateIndex).toString())
                     }
                     statesMap[state] = stateIndex
@@ -79,11 +103,11 @@ class Generator {
 
                 for (automaton in automata) {
                     val stateFieldName = getAutomatonStateName(automaton.name.toString())
-                    fields.add(TypeName.INT, stateFieldName.replace("\$\$", "\$"), Modifier.PUBLIC) {
+                    fields.add(TypeName.INT, stateFieldName.withoutDoubleDollar, Modifier.PUBLIC) {
                         val defaultStateName = automaton.states.firstOrNull()
                             ?.name
                             ?.getStateName(automaton)
-                            ?: "0"
+                            ?: "null"
                         initializer(defaultStateName)
                     }
                     
@@ -115,7 +139,7 @@ class Generator {
                                 errorIdMap[errorId] = errorMessage
 
                                 append(" else {\n")
-                                append("    org.jetbrains.research.kex.Intrinsics.kexAssert(\"$errorId\", false);\n")
+                                append("    %T.kexAssert(\"$errorId\", false);\n", kexIntrinsicsClassName)
                                 append("}\n")
                             }
                         }
@@ -125,29 +149,25 @@ class Generator {
         }.toString()
     }
 
-    private fun FunctionDecl.getTransitionFunctionName(automaton: Automaton): String {
-        return "transition${automaton.name.toString().capitalize()}Call${name.capitalize()}"
-    }
-
-
     /*
-        IMPORTS
+        package ru.vldf.testlibrary;
 
-        class NAME {
-            final static int STATE0 = 0;
-            final static int STATE1 = 1;
-            ...
+        import spider.SPIDER$SHIFTS;
 
-            %functions%
-        }
+        class Automation {
+            SPIDER$SHIFTS SHIFTS_MANAGER = new spider.SPIDER$SHIFTS();
+
+            PROPERTIES
+
+            FUNCTIONS
      */
-    private fun generateAutomaton(automaton: Automaton, library: LibraryDecl): String {
+    private fun generateAutomaton(automaton: Automaton): String {
         return buildJavaFile(automaton.javaPackage.name) {
             indentSize = 4
             addClass(automaton.name.typeName) {
                 val variables = automaton.statements.filterIsInstance<AutomatonVariableStatement>()
 
-                fields.add(ClassName.get("spider", "SPIDER\$SHIFTS"), "SHIFTS_MANAGER") {
+                fields.add(spiderClassName, "SHIFTS_MANAGER") {
                     initializer("new spider.SPIDER\$\$SHIFTS()")
                 }
 
@@ -196,4 +216,11 @@ class Generator {
         "STATE\$CONST\$${automatonName}\$${toUpperCase()}".replace("$", "$$")
 
     private fun getAutomatonStateName(name: String) = "STATE\$\$${name.toUpperCase()}"
+
+    private fun FunctionDecl.getTransitionFunctionName(automaton: Automaton): String {
+        return "transition${automaton.name.toString().capitalize()}Call${name.capitalize()}"
+    }
+
+    private val String.withoutDoubleDollar: String
+        get() = this.replace("\$\$", "\$")
 }
