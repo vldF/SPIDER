@@ -49,6 +49,10 @@ automaton Memory {
     shift Open -> Close(open);
 }
 
+fun Memory.Memory() {
+    result = new Memory(Close);
+}
+
 fun Memory.open();
 
 fun Memory.setOS(os: OS);

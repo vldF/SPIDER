@@ -7,12 +7,6 @@ class Computer {
 
     Memory memory;
 
-    Computer Computer() {
-        SHIFTS_MANAGER.transitionComputerCallComputer();
-        result = new Computer();
-        result.SHIFTS_MANAGER.STATE$COMPUTER = 0;
-    }
-
     void boot() {
         SHIFTS_MANAGER.transitionComputerCallBoot();
     }

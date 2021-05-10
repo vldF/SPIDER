@@ -19,9 +19,6 @@ public class SPIDER$SHIFTS {
 
     public int STATE$MEMORY = STATE$CONST$Memory$CLOSE;
 
-    public void transitionComputerCallComputer() {
-    }
-
     public void transitionComputerCallBoot() {
         if (STATE$COMPUTER == STATE$CONST$Computer$DOWNED) {
             STATE$COMPUTER = STATE$CONST$Computer$BOOTED;

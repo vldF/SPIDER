@@ -3,6 +3,8 @@ package generators
 import com.hendraanggrian.javapoet.buildJavaFile
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
+import exceptions.SemanticException
+import exceptions.UnknownStateException
 import generators.descriptors.FileDescriptor
 import ru.spbstu.insys.libsl.parser.Automaton
 import ru.spbstu.insys.libsl.parser.AutomatonVariableStatement
@@ -104,14 +106,14 @@ class Generator {
                 for (automaton in automata) {
                     val stateFieldName = getAutomatonStateName(automaton.name.toString())
                     fields.add(TypeName.INT, stateFieldName.withoutDoubleDollar, Modifier.PUBLIC) {
-                        val defaultStateName = automaton.states.firstOrNull()
-                            ?.name
-                            ?.getStateName(automaton)
-                            ?: "null"
+                        val defaultStateName = getAutomatonDefaultState(automaton)
                         initializer(defaultStateName)
                     }
                     
                     for (method in functions[automaton.name.typeName].orEmpty()) {
+                        if (method.name == automaton.name.toString()) {
+                            continue
+                        }
                         val methodName = method.getTransitionFunctionName(automaton)
 
                         methods.add(methodName) {
@@ -175,7 +177,10 @@ class Generator {
                     fields.add(ClassName.get("", variable.type), variable.name)
                 }
 
-                functions[automaton.name.typeName]?.forEach { method ->
+                for (method in functions[automaton.name.typeName].orEmpty()) {
+                    if (method.name == automaton.name.toString()) {
+                        continue
+                    }
                     methods.add(method.name) {
                         val returnTypeName = method.returnValue?.type?.typeName
                         returns = if (returnTypeName != null) {
@@ -208,6 +213,24 @@ class Generator {
                 }
             }
         }.toString()
+    }
+
+    private fun getAutomatonDefaultState(automaton: Automaton): String {
+        val func = functions
+            .entries
+            .firstOrNull { it.key == automaton.name.toString() }
+            ?.value
+            ?.firstOrNull { it.name == automaton.name.toString() }
+            ?: throw UnknownStateException("Constructor function not found for automaton ${automaton.name}")
+
+        val rawStateName = func
+            .variableAssignments
+            .firstOrNull { it.name == "result" }
+            ?.calleeArguments
+            ?.firstOrNull()
+            ?: throw SemanticException("Constructor function for automaton ${automaton.name} hasn't found")
+
+        return rawStateName.getStateName(automaton)
     }
 
     private fun String.getStateName(automaton: Automaton): String = this.getStateName(automaton.name.toString())
