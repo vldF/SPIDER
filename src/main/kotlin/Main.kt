@@ -18,11 +18,12 @@ private const val kexJarPath = "/home/vldf/IdeaProjects/kex/kex-runner/target/ke
 private const val kexBaseDir = "/home/vldf/IdeaProjects/kex/"
 
 fun main(args: Array<String>) {
-    val argParser = ArgParser("SPecification Based Integration Defect Revealer")
+    val argParser = ArgParser("SPecification Based Integration Defect Reveler")
     val lslPath by argParser.option(ArgType.String, "lsl", "i", "lsl file path").required()
     val jarPath by argParser.option(ArgType.String, "libJar", "j", "library jar file path")
     val libraryDirPath by argParser.option(ArgType.String, "libDir", "d", "library dir path")
-    val subject by argParser.option(ArgType.String, "subject", "s", "Class, package or method").required()
+    val libraryPackage by argParser.option(ArgType.String, "libPackage", "lp", "library package").required()
+    val targetPackage by argParser.option(ArgType.String, "targetPackage", "tp", "target package").required()
     argParser.parse(args)
 
     val parser = ModelParser()
@@ -44,7 +45,7 @@ fun main(args: Array<String>) {
             copyLibFiles(libraryFile, targetDir)
         }
         else -> {
-            System.err.println("You must to specify libJar or libDir")
+            System.err.println("You must specify libJar or libDir")
         }
     }
     saveGeneratedCodeToFile(generatedCodeFiles, saveToFile = tmpDir)
@@ -52,7 +53,7 @@ fun main(args: Array<String>) {
 
     println("the code was instrumented")
     println("running KEX...")
-    runKex(kexJarPath, classPath = targetDir.absolutePath, tmpDir, subject)
+    runKex(kexJarPath, classPath = targetDir.absolutePath, tmpDir, targetPackage, libraryPackage)
     processKexResult(File(tmpDir.absolutePath + "/" + "defect.json"), codeGenerator)
 }
 
@@ -106,7 +107,16 @@ private fun deleteFilesThatNamesEqualsWithGenerated(fileDescriptors: List<FileDe
     }
 }
 
-private fun runKex(kexPath: String, classPath: String, tmpDir: File, subject: String) {
+/*
+./kex.sh
+    --classpath ./vldf
+    --target ru.vldf.testlibrary.*
+    --output kex-instrumented
+    --mode libchecker
+    --libCheck ru.vldf.testlibrary.*
+    --log vldf.log
+ */
+private fun runKex(kexPath: String, classPath: String, tmpDir: File, subject: String, libraryPackage: String) {
     val workingDir = File(kexBaseDir)
     val kexArgs = arrayOf(
         "$javaPath/java",
@@ -115,15 +125,18 @@ private fun runKex(kexPath: String, classPath: String, tmpDir: File, subject: St
         "-Djava.security.policy==kex.policy",
         "-jar",
         kexPath,
-        "-cp",
+        "--classpath",
         classPath,
-        "-m",
-        "checker",
-        "-t",
+        "--output",
+        "kex-instrumented",
+        "--mode",
+        "libchecker",
+        "--libCheck",
+        libraryPackage,
+        "--target",
         subject,
-        "--option",
-        "defect:outputFile",
-        "${tmpDir.absolutePath}/defect.json"
+        "--log",
+        "kex.log"
     )
     val runtime = Runtime.getRuntime()
     val kexProcess = runtime.exec(kexArgs, null, workingDir)

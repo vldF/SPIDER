@@ -1,6 +1,7 @@
-package ru.vldf.testlibrary;
+package ru.vldf.client;
 
 import org.jetbrains.research.kex.Intrinsics;
+import ru.vldf.testlibrary.Computer;
 
 public class Main {
     public static void main(String[] args) {
