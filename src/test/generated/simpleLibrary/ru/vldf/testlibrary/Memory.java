@@ -1,19 +1,35 @@
 package ru.vldf.testlibrary;
 
-import spider.SPIDER$SHIFTS;
+import org.jetbrains.research.kex.Intrinsics;
 
 class Memory {
-    SPIDER$SHIFTS SHIFTS_MANAGER = new spider.SPIDER$SHIFTS();
+    private final int STATE$CONST$Memory$CLOSE = 0;
+
+    private final int STATE$CONST$Memory$OPEN = 1;
+
+    public int STATE = STATE$CONST$Memory$CLOSE;
 
     void open() {
-        SHIFTS_MANAGER.transitionMemoryCallOpen();
+        if (STATE == STATE$CONST$Memory$CLOSE) {
+            STATE = STATE$CONST$Memory$OPEN;
+        } else if (STATE == STATE$CONST$Memory$OPEN) {
+            STATE = STATE$CONST$Memory$CLOSE;
+        } else {
+            Intrinsics.kexAssert("id4", false);
+        }
     }
 
     void setOS(ru.vldf.testlibrary.OS os) {
-        SHIFTS_MANAGER.transitionMemoryCallSetOS();
+        if (STATE == STATE$CONST$Memory$OPEN) {
+        } else {
+            Intrinsics.kexAssert("id5", false);
+        }
+    }
+
+    ru.vldf.testlibrary.OS getOS() {
+        return org.jetbrains.research.kex.Objects.kexUnknown<ru.vldf.testlibrary.OS>();
     }
 
     void close() {
-        SHIFTS_MANAGER.transitionMemoryCallClose();
     }
 }

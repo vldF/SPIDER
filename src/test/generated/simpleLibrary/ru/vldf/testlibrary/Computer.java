@@ -1,31 +1,54 @@
 package ru.vldf.testlibrary;
 
-import spider.SPIDER$SHIFTS;
+import org.jetbrains.research.kex.Intrinsics;
 
 class Computer {
-    SPIDER$SHIFTS SHIFTS_MANAGER = new spider.SPIDER$SHIFTS();
+    private final int STATE$CONST$Computer$DOWNED = 0;
+
+    private final int STATE$CONST$Computer$BOOTED = 1;
+
+    private final int STATE$CONST$Computer$OSSELECTED = 2;
+
+    private final int STATE$CONST$Computer$OSLOADED = 3;
 
     Memory memory;
 
+    public int STATE = STATE$CONST$Computer$DOWNED;
+
     void boot() {
-        SHIFTS_MANAGER.transitionComputerCallBoot();
+        if (STATE == STATE$CONST$Computer$DOWNED) {
+            STATE = STATE$CONST$Computer$BOOTED;
+        } else {
+            Intrinsics.kexAssert("id0", false);
+        }
     }
 
     void selectOS(String osName) {
-        SHIFTS_MANAGER.transitionComputerCallSelectOS();
+        if (STATE == STATE$CONST$Computer$BOOTED) {
+            STATE = STATE$CONST$Computer$OSSELECTED;
+        } else {
+            Intrinsics.kexAssert("id1", false);
+        }
     }
 
     void loadOS() {
-        SHIFTS_MANAGER.transitionComputerCallLoadOS();
+        if (STATE == STATE$CONST$Computer$OSSELECTED) {
+            STATE = STATE$CONST$Computer$OSLOADED;
+        } else {
+            Intrinsics.kexAssert("id2", false);
+        }
     }
 
     void shutdown() {
-        SHIFTS_MANAGER.transitionComputerCallShutdown();
+        if (STATE == STATE$CONST$Computer$OSLOADED) {
+            STATE = STATE$CONST$Computer$DOWNED;
+        } else {
+            Intrinsics.kexAssert("id3", false);
+        }
     }
 
     void addMemory() {
-        SHIFTS_MANAGER.transitionComputerCallAddMemory();
         memory = new Memory();
-        memory.SHIFTS_MANAGER.STATE$MEMORY = 4;
+        memory.STATE = 5;
     }
 }

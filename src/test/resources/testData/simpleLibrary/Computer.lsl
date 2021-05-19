@@ -57,4 +57,6 @@ fun Memory.open();
 
 fun Memory.setOS(os: OS);
 
+fun Memory.getOS(): OS
+
 fun Memory.close();

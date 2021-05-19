@@ -10,10 +10,10 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 
-private val targetDir = File("./result/")
-private val tmpDir = File("./tmp/")
+val targetDir = File("./result/")
+val tmpDir = File("./tmp/")
 private const val javaPath = "/usr/lib/jvm/default-runtime/bin/"
-private const val kexIntrinsicsJarPath = "/home/vldf/.m2/repository/org/jetbrains/research/kex-intrinsics/0.0.1/kex-intrinsics-0.0.1.jar"
+private const val kexIntrinsicsJarPath = "/home/vldf/.m2/repository/org/jetbrains/research/kex-intrinsics/0.0.3/kex-intrinsics-0.0.3.jar"
 private const val kexJarPath = "/home/vldf/IdeaProjects/kex/kex-runner/target/kex-runner-0.0.1-jar-with-dependencies.jar"
 private const val kexBaseDir = "/home/vldf/IdeaProjects/kex/"
 
@@ -54,7 +54,7 @@ fun main(args: Array<String>) {
     println("the code was instrumented")
     println("running KEX...")
     runKex(kexJarPath, classPath = targetDir.absolutePath, tmpDir, targetPackage, libraryPackage)
-    processKexResult(File(tmpDir.absolutePath + "/" + "defect.json"), codeGenerator)
+    processKexResult(File(tmpDir.absolutePath + "/defects.json"), codeGenerator, targetDir.absolutePath)
 }
 
 private fun unzipLibToPath(lib: File, target: File) {
@@ -133,6 +133,8 @@ private fun runKex(kexPath: String, classPath: String, tmpDir: File, subject: St
         "libchecker",
         "--libCheck",
         libraryPackage,
+        "--option",
+        "defect:outputFile:${tmpDir.absolutePath}/defects.json",
         "--target",
         subject,
         "--log",
@@ -144,17 +146,24 @@ private fun runKex(kexPath: String, classPath: String, tmpDir: File, subject: St
     kexProcess.printOutput()
 }
 
-private fun processKexResult(defectFile: File, codeGenerator: Generator) {
+fun processKexResult(defectFile: File, codeGenerator: Generator, basePath: String) {
     val gson = Gson()
     val defectsArrayType = (object : TypeToken<Array<Defect>>() {}).type
-    val report = gson.fromJson<Array<Defect>>(defectFile.readText(), defectsArrayType)
-    for (defect in report) {
+    val report: Array<Defect> = gson.fromJson<Array<Defect>>(defectFile.readText(), defectsArrayType)
+    for ((i, defect) in report.withIndex()) {
         if (defect.type != "ASSERT") continue
         val description = codeGenerator.errorIdMap[defect.id] ?: "unknown wrong shift"
-        println("Error on ${defect.location.`package`.name}/${defect.location.file}:${defect.location.line}:")
-        println(description)
-        println("Case on ${defect.testFile}:${defect.testCaseName}")
+        printError("Error #$i:")
+        printError(processStackTrace(defect.callStack, basePath))
+        printError("description $description")
     }
+}
+
+private fun processStackTrace(trace: Array<String>, basePath: String): String {
+    return trace
+        .dropLast(1)
+        .map { it.split(" - ") }
+        .joinToString(separator = "\n") { (first, _) -> "on method $first" }
 }
 
 private fun Process.printOutput() {
@@ -169,4 +178,8 @@ private fun Process.printOutput() {
         System.err.println("javac err:")
         System.err.println(errOutput)
     }
+}
+
+private fun printError(str: String) {
+    System.err.println(str)
 }

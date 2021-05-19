@@ -16,4 +16,8 @@ class Memory {
         isOpen = false
     }
 
+    fun getOS(): OS {
+        return currentOS
+    }
+
 }

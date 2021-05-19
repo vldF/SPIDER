@@ -22,7 +22,6 @@ class Generator {
 
     private val shiftsObjectName = "SPIDER\$SHIFTS"
     private val kexIntrinsicsClassName = ClassName.get("org.jetbrains.research.kex", "Intrinsics")
-    private val spiderClassName = ClassName.get("spider", "SPIDER\$SHIFTS")
 
     fun generateCode(library: LibraryDecl): Map<FileDescriptor, String> {
         for (function in library.functions) {
@@ -37,19 +36,9 @@ class Generator {
             typesAliases[type.semanticType.typeName] = type.codeType.typeName
         }
 
-        val allStates = library.automata.flatMap { automaton ->
-            automaton.states.map { state ->
-                state.name.getStateName(automaton)
-            }
-        }
+        initStatesMap(library)
 
         val result = mutableMapOf<FileDescriptor, String>()
-        val shiftsFileDescriptor = FileDescriptor(
-            path = "spider/",
-            nameWithoutExtension = shiftsObjectName,
-            extension = "java"
-        )
-        result[shiftsFileDescriptor] = generateShiftsObject(library.automata, allStates)
 
         for (automaton in library.automata) {
             val javaPackage = automaton.javaPackage.name
@@ -63,6 +52,15 @@ class Generator {
         }
 
         return result
+    }
+
+    private fun initStatesMap(library: LibraryDecl) {
+        var i = 0
+        for (automaton in library.automata) {
+            automaton.states.forEach { state ->
+                statesMap[state.name.getStateName(automaton)] = ++i
+            }
+        }
     }
 
     /*
@@ -89,6 +87,7 @@ class Generator {
         }
      */
 
+    /*
     @Suppress("NAME_SHADOWING")
     private fun generateShiftsObject(automata: List<Automaton>, allStates: List<String>): String {
         return buildJavaFile("spider") {
@@ -150,6 +149,7 @@ class Generator {
             }
         }.toString()
     }
+    */
 
     /*
         package ru.vldf.testlibrary;
@@ -169,12 +169,25 @@ class Generator {
             addClass(automaton.name.typeName) {
                 val variables = automaton.statements.filterIsInstance<AutomatonVariableStatement>()
 
-                fields.add(spiderClassName, "SHIFTS_MANAGER") {
-                    initializer("new spider.SPIDER\$\$SHIFTS()")
+                for ((stateIndex, state) in automaton.states.withIndex()) {
+                    // state.withoutDoubleDollar is used due strange behaviour of javapoet-ktx
+                    fields.add(
+                        TypeName.INT,
+                        state.name.getStateName(automaton).withoutDoubleDollar,
+                        Modifier.FINAL,
+                        Modifier.PRIVATE
+                    ) {
+                        initializer((stateIndex).toString())
+                    }
                 }
 
                 variables.forEach { variable ->
                     fields.add(ClassName.get("", variable.type), variable.name)
+                }
+
+                fields.add(ClassName.INT, "STATE") {
+                    addModifiers(Modifier.PUBLIC)
+                    initializer(getAutomatonDefaultState(automaton))
                 }
 
                 for (method in functions[automaton.name.typeName].orEmpty()) {
@@ -182,7 +195,7 @@ class Generator {
                         continue
                     }
                     methods.add(method.name) {
-                        val returnTypeName = method.returnValue?.type?.typeName
+                        val returnTypeName = typesAliases[method.returnValue?.type?.typeName]
                         returns = if (returnTypeName != null) {
                             ClassName.get("", returnTypeName)
                         } else {
@@ -196,19 +209,47 @@ class Generator {
                             }
                         }
 
-                        val transitionFunctionName = method.getTransitionFunctionName(automaton)
-                        appendLine("SHIFTS_MANAGER.$transitionFunctionName()")
+                        val shiftsMap = automaton.shifts.filter { it.functions.contains(method.name) }.map { it.from to it.to }
+                        if (shiftsMap.isNotEmpty()) {
+
+                            val (firstFlowFrom, firstFlowTo) = shiftsMap.first()
+                            append("if (STATE == ${firstFlowFrom.getStateName(automaton)}) {\n")
+                            if (firstFlowTo != "self") {
+                                append("    STATE = ${firstFlowTo.getStateName(automaton)};\n")
+                            }
+                            append("}")
+
+                            for ((from, to) in shiftsMap.subList(1, shiftsMap.size)) {
+                                append(" else if (STATE == ${from.getStateName(automaton)}) {\n")
+                                if (to != "self") {
+                                    append("    STATE = ${to.getStateName(automaton)};\n")
+                                }
+                                append("}")
+                            }
+
+                            val errorMessage = "Invalid shift by calling method `${method.name}`"
+                            val errorId = "id${assertionId++}"
+                            errorIdMap[errorId] = errorMessage
+
+                            append(" else {\n")
+                            append("    %T.kexAssert(\"$errorId\", false);\n", kexIntrinsicsClassName)
+                            append("}\n")
+                        }
+
                         method.variableAssignments.forEach { assignment ->
                             appendLine("${assignment.name} = new ${assignment.calleeAutomatonName}()")
                             val foreignAutomatonNewState = assignment.calleeArguments.firstOrNull()
                             if (foreignAutomatonNewState != null) {
-                                val newStateName = getAutomatonStateName(assignment.calleeAutomatonName)
-
                                 val targetStateConstValue = statesMap[foreignAutomatonNewState.getStateName(assignment.calleeAutomatonName)]
 
-                                appendLine("${assignment.name}.SHIFTS_MANAGER.$newStateName = $targetStateConstValue")
+                                appendLine("${assignment.name}.STATE = $targetStateConstValue")
                             }
                         }
+
+                        if (method.returnValue != null) {
+                            appendLine("return org.jetbrains.research.kex.Objects.kexUnknown<$returnTypeName>()")
+                        }
+
                     }
                 }
             }
