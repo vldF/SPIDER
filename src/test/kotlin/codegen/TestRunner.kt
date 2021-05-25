@@ -1,3 +1,5 @@
+package codegen
+
 import generators.Generator
 import org.junit.jupiter.api.Assertions
 import ru.spbstu.insys.libsl.parser.ModelParser
@@ -62,7 +64,7 @@ fun wipeTestDataAndGenerateAllFiles(dirPath: String) {
     val dir = File(dirPath)
     val testName = dir.name
 
-    File(basePath+testName).deleteRecursively()
+    File(basePath +testName).deleteRecursively()
 
     // todo: add multipy files supportions
     val lslFile = dir.listFiles()!!.first { it.name.endsWith(".lsl") }
