@@ -7,7 +7,7 @@ import java.io.File
 
 private const val basePath = "./src/test/generated/" // / in the end of path is important
 
-fun runTest(dirPath: String) {
+fun runCodegenTest(dirPath: String, throwException: Boolean = true) {
     val dir = File(dirPath)
     val testName = dir.name
     // todo: add multipy files supportions
@@ -29,8 +29,9 @@ fun runTest(dirPath: String) {
             file.createNewFile()
             file.writeText(code)
         }
-
-        error("New test data was created: $testName")
+        if (throwException) {
+            error("New test data was created: $testName")
+        }
     }
 
     val oldTestFiles = recursiveFileFinder(oldTestFile)
@@ -55,7 +56,7 @@ fun runTest(dirPath: String) {
         file.writeText(generated[newFile]!!)
     }
 
-    if (deltaFiles.isNotEmpty()) {
+    if (deltaFiles.isNotEmpty() && throwException) {
         error("New files ${deltaFiles.joinToString(",")} were generated")
     }
 }

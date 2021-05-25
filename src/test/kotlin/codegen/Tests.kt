@@ -6,6 +6,6 @@ class Tests {
 
     @Test
     fun simpleLibrary() {
-        codegen.runTest("./src/test/resources/testData/simpleLibrary")
+        runCodegenTest("./src/test/resources/testData/simpleLibrary")
     }
 }
