@@ -111,29 +111,41 @@ class Generator {
 
                         val shiftsMap = automaton.shifts.filter { it.functions.contains(method.name) }.map { it.from to it.to }
                         if (shiftsMap.isNotEmpty()) {
-
-                            val (firstFlowFrom, firstFlowTo) = shiftsMap.first()
-                            append("if (STATE == ${firstFlowFrom.getStateName(automaton)}) {\n")
-                            if (firstFlowTo != "self") {
-                                append("    STATE = ${firstFlowTo.getStateName(automaton)};\n")
-                            }
-                            append("}")
-
-                            for ((from, to) in shiftsMap.subList(1, shiftsMap.size)) {
-                                append(" else if (STATE == ${from.getStateName(automaton)}) {\n")
-                                if (to != "self") {
-                                    append("    STATE = ${to.getStateName(automaton)};\n")
+                            var anyTransitionCount = 0
+                            var transitionFromAnyToStateName: String? = null
+                            for ((from, to) in shiftsMap) {
+                                if (from.toLowerCase() == "any") {
+                                    transitionFromAnyToStateName = to.getStateName(automaton)
+                                    anyTransitionCount++
+                                    continue
                                 }
-                                append("}")
+
+                                append("if (STATE == ${from.getStateName(automaton)}) {\n")
+                                if (to.toLowerCase() != "self") {
+                                    appendLine("    STATE = ${to.getStateName(automaton)}")
+                                    // else: stay at this state
+                                }
+                                append("} else ")
+                            }
+                            if (shiftsMap.size - anyTransitionCount > 0) {
+                                append("{\n")
+                            }
+                            if (transitionFromAnyToStateName != null) {
+                                appendLine("STATE = $transitionFromAnyToStateName")
+                            } else {
+                                val errorMessage = "Invalid shift by calling method `${method.name}`"
+                                val errorId = "id${assertionId++}"
+                                errorIdMap[errorId] = errorMessage
+
+                                appendLine("    %T.kexAssert(\"$errorId\", false)", kexIntrinsicsClassName)
+                            }
+                            if (shiftsMap.size - anyTransitionCount > 0) {
+                                append("}\n")
                             }
 
-                            val errorMessage = "Invalid shift by calling method `${method.name}`"
-                            val errorId = "id${assertionId++}"
-                            errorIdMap[errorId] = errorMessage
-
-                            append(" else {\n")
-                            append("    %T.kexAssert(\"$errorId\", false);\n", kexIntrinsicsClassName)
-                            append("}\n")
+                            if (anyTransitionCount > 1) {
+                                System.err.println("Ambiguity Any transition in ${automaton.name}.${method.name}")
+                            }
                         }
 
                         method.variableAssignments.forEach { assignment ->
@@ -141,13 +153,12 @@ class Generator {
                             val foreignAutomatonNewState = assignment.calleeArguments.firstOrNull()
                             if (foreignAutomatonNewState != null) {
                                 val targetStateConstValue = statesMap[foreignAutomatonNewState.getStateName(assignment.calleeAutomatonName)]
-
                                 appendLine("${assignment.name}.STATE = $targetStateConstValue")
                             }
                         }
 
                         if (method.returnValue != null) {
-                            appendLine("return org.jetbrains.research.kex.Objects.kexUnknown<$returnTypeName>()")
+                            appendLine("return org.jetbrains.research.kex.Objects.kexUnknown()")
                         }
 
                     }

@@ -40,11 +40,7 @@ class Computer {
     }
 
     void shutdown() {
-        if (STATE == STATE$CONST$Computer$OSLOADED) {
-            STATE = STATE$CONST$Computer$DOWNED;
-        } else {
-            Intrinsics.kexAssert("id3", false);
-        }
+        STATE = STATE$CONST$Computer$DOWNED;
     }
 
     void addMemory() {

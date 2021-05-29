@@ -16,11 +16,12 @@ automaton Computer {
     state Booted;
     state OSSelected;
     state OSLoaded;
+    finishstate Closed;
 
     shift Downed -> Booted(boot);
     shift Booted -> OSSelected(selectOS);
     shift OSSelected -> OSLoaded(loadOS);
-    shift OSLoaded -> Downed(shutdown);
+    shift Any -> Downed(shutdown);
 }
 
 fun Computer.Computer(): Computer {

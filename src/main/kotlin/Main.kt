@@ -12,10 +12,10 @@ import java.io.InputStreamReader
 
 val targetDir = File("./result/")
 val tmpDir = File("./tmp/")
-private const val javaPath = "/usr/lib/jvm/default-runtime/bin/"
-private const val kexIntrinsicsJarPath = "/home/vldf/.m2/repository/org/jetbrains/research/kex-intrinsics/0.0.3/kex-intrinsics-0.0.3.jar"
-private const val kexJarPath = "/home/vldf/IdeaProjects/kex/kex-runner/target/kex-runner-0.0.1-jar-with-dependencies.jar"
-private const val kexBaseDir = "/home/vldf/IdeaProjects/kex/"
+const val javaPath = "/usr/lib/jvm/default-runtime/bin/"
+const val kexIntrinsicsJarPath = "/home/vldf/Desktop/kex-intrinsics-0.0.4.jar"
+const val kexJarPath = "/home/vldf/IdeaProjects/kex/kex-runner/target/kex-runner-0.0.1-jar-with-dependencies.jar"
+const val kexBaseDir = "/home/vldf/IdeaProjects/kex/"
 
 fun main(args: Array<String>) {
     val argParser = ArgParser("SPecification Based Integration Defect Reveler")
@@ -82,7 +82,7 @@ private fun saveGeneratedCodeToFile(generated: Map<FileDescriptor, String>, save
     }
 }
 
-private fun compileMockCode(codeFromDir: File, generatedFileNames: List<FileDescriptor>, target: File) {
+fun compileMockCode(codeFromDir: File, generatedFileNames: List<FileDescriptor>, target: File) {
     deleteFilesThatNamesEqualsWithGenerated(generatedFileNames, target)
     File(codeFromDir.absolutePath + "/" + "@sources.txt").writeText(generatedFileNames.joinToString("\n") { "${codeFromDir.absolutePath}/${it.fullPath}" })
     val javacArgs = arrayOf(
@@ -116,7 +116,7 @@ private fun deleteFilesThatNamesEqualsWithGenerated(fileDescriptors: List<FileDe
     --libCheck ru.vldf.testlibrary.*
     --log vldf.log
  */
-private fun runKex(kexPath: String, classPath: String, tmpDir: File, subject: String, libraryPackage: String) {
+fun runKex(kexPath: String, classPath: String, tmpDir: File, subject: String, libraryPackage: String) {
     val workingDir = File(kexBaseDir)
     val kexArgs = arrayOf(
         "$javaPath/java",
