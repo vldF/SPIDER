@@ -10,14 +10,14 @@ private const val basePath = "./src/test/generated/" // / in the end of path is 
 fun runCodegenTest(dirPath: String, throwException: Boolean = true) {
     val dir = File(dirPath)
     val testName = dir.name
-    // todo: add multipy files supportions
+    // todo: add multiply files supporting
 
     val lslFile = dir.listFiles()!!.first { it.name.endsWith(".lsl") }
     val parser = ModelParser()
     val stream = lslFile.inputStream()
     val parsed = parser.parse(stream)
 
-    val generated = Generator().generateCode(parsed).entries.map { it.key.fullPathWithoutExtension to it.value }.toMap()
+    val generated = Generator().generateCode(parsed).entries.associate { it.key.fullPathWithoutExtension to it.value }
 
     val oldTestFile = File("$basePath$testName")
     if (!oldTestFile.exists()) {
@@ -77,8 +77,7 @@ fun wipeTestDataAndGenerateAllFiles(dirPath: String) {
     val generated = Generator()
         .generateCode(parsed)
         .entries
-        .map { it.key.fullPathWithoutExtension to it.value }
-        .toMap()
+        .associate { it.key.fullPathWithoutExtension to it.value }
 
     for ((path, code) in generated) {
         val codeFile = File("$basePath$testName/$path.java")
@@ -87,7 +86,7 @@ fun wipeTestDataAndGenerateAllFiles(dirPath: String) {
     }
 }
 
-private fun recursiveFileFinder(baseDir: File): List<File> {
+fun recursiveFileFinder(baseDir: File): List<File> {
     val dirContent = baseDir.listFiles() ?: return listOf()
     return dirContent.filter{ it.isFile && it.name.endsWith(".java") } +
             dirContent.filter { it.isDirectory }.flatMap { recursiveFileFinder(it) }

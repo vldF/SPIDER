@@ -1,0 +1,22 @@
+[
+  {
+    "callStack": [
+      "ru/vldf/simplelibrary/Computer::boot(): void - ru/vldf/simplelibrary/Computer.java:22",
+      "ru/vldf/client/Main::main(java/lang/String[]): void - ru/vldf/client/Main.java:10"
+    ],
+    "id": "id0",
+    "testCaseName": "testAssertion0",
+    "testFile": {},
+    "type": "ASSERT"
+  },
+  {
+    "callStack": [
+      "ru/vldf/simplelibrary/Computer::loadOS(): void - ru/vldf/simplelibrary/Computer.java:38",
+      "ru/vldf/client/Main::main(java/lang/String[]): void - ru/vldf/client/Main.java:11"
+    ],
+    "id": "id2",
+    "testCaseName": "testAssertion0",
+    "testFile": {},
+    "type": "ASSERT"
+  }
+]

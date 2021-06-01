@@ -116,7 +116,7 @@ private fun deleteFilesThatNamesEqualsWithGenerated(fileDescriptors: List<FileDe
     --libCheck ru.vldf.testlibrary.*
     --log vldf.log
  */
-fun runKex(kexPath: String, classPath: String, tmpDir: File, subject: String, libraryPackage: String) {
+fun runKex(kexPath: String, classPath: String, tmpDir: File, libraryTarget: String, clientTarget: String) {
     val workingDir = File(kexBaseDir)
     val kexArgs = arrayOf(
         "$javaPath/java",
@@ -132,11 +132,11 @@ fun runKex(kexPath: String, classPath: String, tmpDir: File, subject: String, li
         "--mode",
         "libchecker",
         "--libCheck",
-        libraryPackage,
+        clientTarget,
         "--option",
         "defect:outputFile:${tmpDir.absolutePath}/defects.json",
         "--target",
-        subject,
+        libraryTarget,
         "--log",
         "kex.log"
     )
@@ -166,16 +166,16 @@ private fun processStackTrace(trace: Array<String>, basePath: String): String {
         .joinToString(separator = "\n") { (first, _) -> "on method $first" }
 }
 
-private fun Process.printOutput() {
+fun Process.printOutput() {
     val stdOutput = BufferedReader(InputStreamReader(inputStream)).readText()
     val errOutput = BufferedReader(InputStreamReader(errorStream)).readText()
     if (stdOutput.isNotBlank()) {
-        println("javac std:")
+        println("std:")
         println(stdOutput)
     }
 
     if (errOutput.isNotBlank()) {
-        System.err.println("javac err:")
+        System.err.println("err:")
         System.err.println(errOutput)
     }
 }

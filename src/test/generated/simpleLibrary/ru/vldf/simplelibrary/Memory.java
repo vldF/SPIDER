@@ -1,15 +1,15 @@
-package ru.vldf.testlibrary;
+package ru.vldf.simplelibrary;
 
 import org.jetbrains.research.kex.Intrinsics;
 
-class Memory {
+public class Memory {
     private final int STATE$CONST$Memory$CLOSE = 0;
 
     private final int STATE$CONST$Memory$OPEN = 1;
 
     public int STATE = STATE$CONST$Memory$CLOSE;
 
-    void open() {
+    public void open() {
         if (STATE == STATE$CONST$Memory$CLOSE) {
             STATE = STATE$CONST$Memory$OPEN;
         } else if (STATE == STATE$CONST$Memory$OPEN) {
@@ -19,17 +19,17 @@ class Memory {
         }
     }
 
-    void setOS(ru.vldf.testlibrary.OS os) {
+    public void setOS(ru.vldf.simplelibrary.OS os) {
         if (STATE == STATE$CONST$Memory$OPEN) {
         } else {
             Intrinsics.kexAssert("id4", false);
         }
     }
 
-    ru.vldf.testlibrary.OS getOS() {
+    public ru.vldf.simplelibrary.OS getOS() {
         return org.jetbrains.research.kex.Objects.kexUnknown();
     }
 
-    void close() {
+    public void close() {
     }
 }

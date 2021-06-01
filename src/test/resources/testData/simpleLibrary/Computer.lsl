@@ -1,14 +1,14 @@
 library Computer;
 
 types {
-    Computer (ru.vldf.testlibrary.Computer);
-    Memory (ru.vldf.testlibrary.Memory);
-    OS (ru.vldf.testlibrary.OS);
+    Computer (ru.vldf.simplelibrary.Computer);
+    Memory (ru.vldf.simplelibrary.Memory);
+    OS (ru.vldf.simplelibrary.OS);
     OSName (String);
 }
 
 automaton Computer {
-    javapackage ru.vldf.testlibrary;
+    javapackage ru.vldf.simplelibrary;
 
     var memory : Memory;
 
@@ -41,7 +41,7 @@ fun Computer.addMemory() {
 } // todo: add another one automaton
 
 automaton Memory {
-    javapackage ru.vldf.testlibrary;
+    javapackage ru.vldf.simplelibrary;
     state Close;
     state Open;
 

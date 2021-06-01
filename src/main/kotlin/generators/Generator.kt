@@ -67,6 +67,7 @@ class Generator {
         return buildJavaFile(automaton.javaPackage.name) {
             indentSize = 4
             addClass(automaton.name.typeName) {
+                modifiers.add(Modifier.PUBLIC)
                 val variables = automaton.statements.filterIsInstance<AutomatonVariableStatement>()
 
                 for ((stateIndex, state) in automaton.states.withIndex()) {
@@ -82,7 +83,7 @@ class Generator {
                 }
 
                 variables.forEach { variable ->
-                    fields.add(ClassName.get("", variable.type), variable.name)
+                    fields.add(ClassName.get("", variable.type), variable.name, Modifier.PUBLIC)
                 }
 
                 fields.add(ClassName.INT, "STATE") {
@@ -95,6 +96,7 @@ class Generator {
                         continue
                     }
                     methods.add(method.name) {
+                        modifiers.add(Modifier.PUBLIC)
                         val returnTypeName = typesAliases[method.returnValue?.type?.typeName]
                         returns = if (returnTypeName != null) {
                             ClassName.get("", returnTypeName)

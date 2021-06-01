@@ -1,8 +1,8 @@
-package ru.vldf.testlibrary;
+package ru.vldf.simplelibrary;
 
 import org.jetbrains.research.kex.Intrinsics;
 
-class Computer {
+public class Computer {
     private final int STATE$CONST$Computer$DOWNED = 0;
 
     private final int STATE$CONST$Computer$BOOTED = 1;
@@ -11,11 +11,11 @@ class Computer {
 
     private final int STATE$CONST$Computer$OSLOADED = 3;
 
-    Memory memory;
+    public Memory memory;
 
     public int STATE = STATE$CONST$Computer$DOWNED;
 
-    void boot() {
+    public void boot() {
         if (STATE == STATE$CONST$Computer$DOWNED) {
             STATE = STATE$CONST$Computer$BOOTED;
         } else {
@@ -23,7 +23,7 @@ class Computer {
         }
     }
 
-    void selectOS(String osName) {
+    public void selectOS(String osName) {
         if (STATE == STATE$CONST$Computer$BOOTED) {
             STATE = STATE$CONST$Computer$OSSELECTED;
         } else {
@@ -31,7 +31,7 @@ class Computer {
         }
     }
 
-    void loadOS() {
+    public void loadOS() {
         if (STATE == STATE$CONST$Computer$OSSELECTED) {
             STATE = STATE$CONST$Computer$OSLOADED;
         } else {
@@ -39,11 +39,11 @@ class Computer {
         }
     }
 
-    void shutdown() {
+    public void shutdown() {
         STATE = STATE$CONST$Computer$DOWNED;
     }
 
-    void addMemory() {
+    public void addMemory() {
         memory = new Memory();
         memory.STATE = 5;
     }
