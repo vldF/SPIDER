@@ -182,7 +182,7 @@ class Generator {
             .firstOrNull { it.name == "result" }
             ?.calleeArguments
             ?.firstOrNull()
-            ?: throw SemanticException("Constructor function for automaton ${automaton.name} hasn't found")
+            ?: throw SemanticException("Constructor function for automaton ${automaton.name} wasn't found")
 
         return rawStateName.getStateName(automaton)
     }

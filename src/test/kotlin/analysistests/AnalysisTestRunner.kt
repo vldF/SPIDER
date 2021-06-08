@@ -25,12 +25,12 @@ private val gson = GsonBuilder().setPrettyPrinting().create()
  */
 fun runAnalysisTest(lslsPath: String) {
     cleanTmp()
-    // is test's codegen exists?
     val testName = testNameRegex.find(lslsPath)?.groupValues?.get(2)
     val testGeneratedCodePath = "${generatedCodeDir}$testName"
     val generatedTestsFile = File(testGeneratedCodePath)
     val clientSourceFiles = File("$testDataBaseDir$testName/java")
     val librarySourceFiles = File("$testDataBaseDir$testName/javaLibrary")
+    var targetLibraryFile = File("$testDataBaseDir$testName/javaClasses")
 
     if (!(generatedTestsFile.exists() && generatedTestsFile.isDirectory)) {
         runCodegenTest(lslsPath)
@@ -39,12 +39,15 @@ fun runAnalysisTest(lslsPath: String) {
     val generatedFileDescriptors = recursiveFileFinder(generatedTestsFile).map { file ->
         FileDescriptor(file.parentFile.path + "/", file.nameWithoutExtension, file.extension)
     }
-    val targetLibraryFile = File(tmpDir + testName + "Library").apply { mkdirs() }
     val targetFile = File(tmpDir + testName + "Client").apply { mkdirs() }
 
-    val resLibraryJavac = compileJavaLibrarySources(librarySourceFiles, targetLibraryFile)
-    if (!resLibraryJavac) {
-        throw IllegalStateException("library compilation failed")
+    if (librarySourceFiles.exists()) {
+        targetLibraryFile = File(tmpDir + testName + "Library").apply { mkdirs() }
+
+        val resLibraryJavac = compileJavaLibrarySources(librarySourceFiles, targetLibraryFile)
+        if (!resLibraryJavac) {
+            throw IllegalStateException("library compilation failed")
+        }
     }
     val resCompileMock = compileMockCode(
         codeFromDir = generatedTestsFile,

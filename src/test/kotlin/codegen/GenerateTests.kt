@@ -39,7 +39,7 @@ private fun generateTestFunction(name: String): String {
         appendLine()
         appendLine("    @Test")
         appendLine("    fun $name() {")
-        appendLine("        runTest(\"$baseTestDataRoot$name\")")
+        appendLine("        runCodegenTest(\"$baseTestDataRoot$name\")")
         appendLine("    }")
     }
 }
