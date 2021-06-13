@@ -12,10 +12,10 @@ import java.io.InputStreamReader
 
 val targetDir = File("./result/")
 val tmpDir = File("./tmp/")
-const val javaPath = "/usr/lib/jvm/default-runtime/bin/"
+const val javaPath = "C:\\Program Files\\Java\\jdk-15.0.2\\bin"
 const val kexIntrinsicsJarPath = "/home/vldf/Desktop/kex-intrinsics-0.0.4.jar"
-const val kexJarPath = "/home/vldf/IdeaProjects/kex/kex-runner/target/kex-runner-0.0.1-jar-with-dependencies.jar"
-const val kexBaseDir = "/home/vldf/IdeaProjects/kex/"
+const val kexJarPath = "C:\\Users\\vladi\\IdeaProjects\\kex\\kex-runner\\target\\kex-runner-0.0.1-jar-with-dependencies.jar"
+const val kexBaseDir = "C:\\Users\\vladi\\IdeaProjects\\kex\\"
 
 fun main(args: Array<String>) {
     val argParser = ArgParser("SPecification Based Integration Defect Reveler")

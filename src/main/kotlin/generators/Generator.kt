@@ -1,5 +1,6 @@
 package generators
 
+import SEP
 import com.hendraanggrian.javapoet.buildJavaFile
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
@@ -20,7 +21,6 @@ class Generator {
     private val statesMap = mutableMapOf<String, Int>()
     val errorIdMap = mutableMapOf<String, String>()
 
-    private val shiftsObjectName = "SPIDER\$SHIFTS"
     private val kexIntrinsicsClassName = ClassName.get("org.jetbrains.research.kex", "Intrinsics")
 
     fun generateCode(library: LibraryDecl): Map<FileDescriptor, String> {
@@ -42,13 +42,13 @@ class Generator {
 
         for (automaton in library.automata) {
             val javaPackage = automaton.javaPackage.name
-            val packageLikeFilePath = javaPackage.replace(".", "/") + "/"
+            val packageLikeFilePath = javaPackage.replace(".", SEP) + SEP
             val fileDescriptor = FileDescriptor(
                 path = packageLikeFilePath,
                 nameWithoutExtension = automaton.name.typeName,
                 "java"
             )
-            result[fileDescriptor] = generateAutomaton(automaton)
+            result[fileDescriptor] = generateAutomaton(automaton).replace("\n", System.lineSeparator())
         }
 
         return result
@@ -191,12 +191,6 @@ class Generator {
 
     private fun String.getStateName(automatonName: String) =
         "STATE\$CONST\$${automatonName}\$${toUpperCase()}".replace("$", "$$")
-
-    private fun getAutomatonStateName(name: String) = "STATE\$\$${name.toUpperCase()}"
-
-    private fun FunctionDecl.getTransitionFunctionName(automaton: Automaton): String {
-        return "transition${automaton.name.toString().capitalize()}Call${name.capitalize()}"
-    }
 
     private val String.withoutDoubleDollar: String
         get() = this.replace("\$\$", "\$")

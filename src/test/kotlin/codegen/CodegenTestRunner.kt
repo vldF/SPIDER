@@ -1,11 +1,12 @@
 package codegen
 
+import SEP
 import generators.Generator
 import org.junit.jupiter.api.Assertions
 import ru.spbstu.insys.libsl.parser.ModelParser
 import java.io.File
 
-private const val basePath = "./src/test/generated/" // / in the end of path is important
+private val basePath = ".${SEP}src${SEP}test${SEP}generated${SEP}" // / in the end of path is important
 
 fun runCodegenTest(dirPath: String, throwException: Boolean = true) {
     val dir = File(dirPath)
@@ -23,7 +24,7 @@ fun runCodegenTest(dirPath: String, throwException: Boolean = true) {
     if (!oldTestFile.exists()) {
         oldTestFile.mkdirs()
         for ((path, code) in generated) {
-            val file = File("$basePath$testName/$path.java")
+            val file = File("$basePath$testName$SEP$path.java")
             val dirToBeCreated = file.parentFile
             dirToBeCreated.mkdirs()
             file.createNewFile()
@@ -50,7 +51,7 @@ fun runCodegenTest(dirPath: String, throwException: Boolean = true) {
     val deltaFiles = newGeneratedFiles - oldTestFiles.map { it.path.toSimpleFileNameWithoutExtension(oldTestFile) }.toSet()
 
     for (newFile in deltaFiles) {
-        val file = File("$basePath$testName/$newFile.java")
+        val file = File("$basePath$testName$SEP$newFile.java")
         file.parentFile.mkdirs()
         file.createNewFile()
         file.writeText(generated[newFile]!!)
@@ -80,7 +81,7 @@ fun wipeTestDataAndGenerateAllFiles(dirPath: String) {
         .associate { it.key.fullPathWithoutExtension to it.value }
 
     for ((path, code) in generated) {
-        val codeFile = File("$basePath$testName/$path.java")
+        val codeFile = File("$basePath$testName$SEP$path.java")
         codeFile.parentFile.mkdirs()
         codeFile.writeText(code)
     }
@@ -93,5 +94,5 @@ fun recursiveFileFinder(baseDir: File): List<File> {
 }
 
 private fun String.toSimpleFileNameWithoutExtension(oldTestFile: File): String {
-    return removePrefix(oldTestFile.path+"/").removeSuffix(".java")
+    return removePrefix(oldTestFile.path + SEP).removeSuffix(".java")
 }
