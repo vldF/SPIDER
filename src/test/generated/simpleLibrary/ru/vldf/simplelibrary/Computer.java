@@ -11,6 +11,8 @@ public class Computer {
 
     private final int STATE$CONST$Computer$OSLOADED = 3;
 
+    private final int STATE$CONST$Computer$CLOSED = 4;
+
     public Memory memory;
 
     public int STATE = STATE$CONST$Computer$DOWNED;
@@ -24,6 +26,7 @@ public class Computer {
     }
 
     public void selectOS(String osName) {
+        kexAssert((osName != 1) || (osName != 1.0));
         if (STATE == STATE$CONST$Computer$BOOTED) {
             STATE = STATE$CONST$Computer$OSSELECTED;
         } else {
@@ -45,6 +48,6 @@ public class Computer {
 
     public void addMemory() {
         memory = new Memory();
-        memory.STATE = 5;
+        memory.STATE = 6;
     }
 }

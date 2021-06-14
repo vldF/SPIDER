@@ -30,7 +30,9 @@ fun Computer.Computer(): Computer {
 
 fun Computer.boot();
 
-fun Computer.selectOS(osName: OSName);
+fun Computer.selectOS(osName: OSName) {
+    requires (osName != 1) || (osName != 1.0);
+}
 
 fun Computer.loadOS();
 

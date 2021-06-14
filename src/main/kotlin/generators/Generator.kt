@@ -41,8 +41,8 @@ class Generator {
         val result = mutableMapOf<FileDescriptor, String>()
 
         for (automaton in library.automata) {
-            val javaPackage = automaton.javaPackage.name
-            val packageLikeFilePath = javaPackage.replace(".", SEP) + SEP
+            val javaPackage = automaton.javaPackage?.name
+            val packageLikeFilePath = javaPackage?.replace(".", SEP) + SEP
             val fileDescriptor = FileDescriptor(
                 path = packageLikeFilePath,
                 nameWithoutExtension = automaton.name.typeName,
@@ -64,7 +64,7 @@ class Generator {
     }
 
     private fun generateAutomaton(automaton: Automaton): String {
-        return buildJavaFile(automaton.javaPackage.name) {
+        return buildJavaFile(automaton.javaPackage?.name ?: "") {
             indentSize = 4
             addClass(automaton.name.typeName) {
                 modifiers.add(Modifier.PUBLIC)
@@ -97,6 +97,10 @@ class Generator {
                     }
                     methods.add(method.name) {
                         modifiers.add(Modifier.PUBLIC)
+                        if (method.requires != null) {
+                            appendLine("kexAssert(" + method.requires!!.toJava() + ")")
+                        }
+
                         val returnTypeName = typesAliases[method.returnValue?.type?.typeName]
                         returns = if (returnTypeName != null) {
                             ClassName.get("", returnTypeName)
