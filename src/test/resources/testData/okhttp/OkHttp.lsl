@@ -1,7 +1,6 @@
 library OkHttp;
 
 types {
-    OkHttpClient(okhttp3.OkHttpClient)
     RequestBuilder(okhttp3.Request.Builder);
     String(String);
     Request(okhttp3.Request);
@@ -9,88 +8,106 @@ types {
     Client(okhttp3.OkHttpClient);
     Call(okhttp3.Call);
     ResponseBody(okhttp3.ResponseBody);
-    RequestBody(okhttp3.RequestBody);
     HttpUrl(okhttp3.HttpUrl);
-
-    URL(java.net.URL);
-    List(java.util.ArrayList);
 }
 
-automaton Request {
-    javapackage okhttp3;
-
-    state created;
-
+fun RequestBuilder.RequestBuilder() : RequestBuilder {
+    result = new RequestBuilder(Created);
 }
 
-fun Request.Request() {
-    result = Request(created);
-}
+fun RequestBuilder.url(urlValue: String) : RequestBuilder;
 
-fun Request.getBody() : RequestBody; // kotlin property (getter)
+fun RequestBuilder.url(urlValue: HttpUrl) : RequestBuilder;
 
-fun Request.header(name: String) : String;
-fun Request.headers(name: String) : List<String>;
-fun Request.newBuilder() : Builder {
-    result = new Builder(created);
-}
-
-
-automaton Builder {
-    javapackage okhttp3;
-
-    state Created, HasURL;
-
-    shift Created -> HasURL(url);
-    shift HasURL -> self(delete, get, head, header, method, patch, post, put, removeHeader);
-}
-
-fun Builder.Builder() : Builder {
-    result = new Builder();
-}
-
-fun Builder.build() : Request {
+fun RequestBuilder.build() : Request {
     result = new Request(Created);
 }
 
-fun Builder.delete() : Builder;
+fun Client.Client() : Client {
+    result = new Client(Created);
+}
 
-fun Builder.get() : Builder;
+fun Client.newCall(request: Request) : Call {
+    result = new Call(Created);
+}
 
-fun Builder.head() : Builder;
+fun Call.execute() : Response {
+    result = new Response(Created);
+}
 
-fun Builder.header(name: String, value: String) : Builder;
+fun Response.body() : ResponseBody {
+    result = new ResponseBody(Created);
+}
 
-fun Builder.header(headers: Headers) : Builder;
+fun ResponseBody.string() : String {
+    //post("ONE", "String-result of response body should not be empty", result != null && !result.isEmpty());
+}
 
-fun Builder.method(method: String, body: RequestBody) : Builder;
+fun Response.close();
 
-fun Builder.patch(body: RequestBody) : Builder;
+automaton RequestBuilder {
+    javapackage okhttp3;
+    state Created, UrlSet;
+    finishstate Built;
 
-fun Builder.post(body: RequestBody) : Builder;
+    shift Created->UrlSet (url);
+    shift UrlSet->Built (build);
+}
 
-fun Builder.put(body: RequestBody) : Builder;
-
-fun Builder.removeHeader(name: String) : Builder;
-
-// todo: add `tag` function
-
-fun Builder.url(url: HttpUrl) : Builder;
-
-fun Builder.url(url: URL) : Builder;
+fun RequestBuilder.RequestBuilder() {
+    result = new RequestBuilder(Created);
+}
 
 automaton Request {
     javapackage okhttp3;
     state Created;
 }
 
-fun Request.Request() : Request {
+fun Request.Request() {
     result = new Request(Created);
 }
 
-
-automaton OkHttpClient {
+automaton Client {
     javapackage okhttp3;
+    state Created;
+}
 
-    state created;
+fun Client.Client() {
+    result = new Client(Created);
+}
+
+automaton Response {
+    javapackage okhttp3;
+    state Created;
+    finishstate Closed;
+
+    shift any->Closed (close);
+}
+
+fun Response.Response() {
+    result = new Response(Created);
+}
+
+automaton ResponseBody {
+    javapackage okhttp3;
+    state Created;
+    finishstate ResultRetrieved;
+
+    shift any->ResultRetrieved (string);
+}
+
+fun ResponseBody.ResponseBody() {
+    result = new ResponseBody(Created);
+}
+
+automaton Call {
+    javapackage okhttp3;
+    state Created;
+    finishstate Executed;
+
+    shift Created->Executed (execute);
+}
+
+fun Call.Call() {
+    result = new Call(Created);
 }
