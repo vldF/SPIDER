@@ -1,12 +1,12 @@
 package codegen
 
-import SEP
-import generators.Generator
+import ru.vldf.spider.SEP
+import ru.vldf.spider.generators.Generator
 import org.junit.jupiter.api.Assertions
 import ru.spbstu.insys.libsl.parser.ModelParser
 import java.io.File
 
-private val basePath = ".${SEP}src${SEP}test${SEP}generated${SEP}" // / in the end of path is important
+private val basePath = ".${SEP}src${SEP}test${SEP}generated$SEP" // / in the end of path is important
 
 fun runCodegenTest(dirPath: String, throwException: Boolean = true) {
     val dir = File(dirPath)

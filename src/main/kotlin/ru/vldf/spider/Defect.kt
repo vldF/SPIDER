@@ -1,3 +1,5 @@
+package ru.vldf.spider
+
 data class Defect (
     val callStack: Array<String>,
     val id: String,

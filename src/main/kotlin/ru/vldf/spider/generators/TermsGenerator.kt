@@ -1,4 +1,4 @@
-package generators
+package ru.vldf.spider.generators
 
 import ru.spbstu.insys.libsl.parser.*
 

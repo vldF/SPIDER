@@ -1,4 +1,4 @@
-package exceptions
+package ru.vldf.spider.exceptions
 
 open class SemanticException(message: String) : Exception(message)
 

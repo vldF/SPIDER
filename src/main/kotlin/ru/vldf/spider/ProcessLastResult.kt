@@ -1,4 +1,6 @@
-import generators.Generator
+package ru.vldf.spider
+
+import ru.vldf.spider.generators.Generator
 import ru.spbstu.insys.libsl.parser.ModelParser
 import java.io.File
 

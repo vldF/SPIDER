@@ -1,13 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Instrument Simple Library" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="ru.vldf.spider.MainKt" />
     <module name="StaticLibraryAnalyzer.main" />
-    <option name="VM_PARAMETERS" value="" />
     <option name="PROGRAM_PARAMETERS" value="--lsl ./src/test/resources/testData/simpleLibrary/Computer.lsl --libDir ./out/production/testLibrary --libPackage ru.vldf.client.* --targetPackage ru.vldf.testlibrary.*" />
-    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-    <option name="ALTERNATIVE_JRE_PATH" />
-    <option name="PASS_PARENT_ENVS" value="true" />
-    <option name="MAIN_CLASS_NAME" value="MainKt" />
-    <option name="WORKING_DIRECTORY" value="" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

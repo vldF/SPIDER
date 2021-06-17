@@ -1,4 +1,4 @@
-package generators.descriptors
+package ru.vldf.spider.generators.descriptors
 
 data class FileDescriptor (
     val path: String,

@@ -1,25 +1,26 @@
 package analysistests
 
-import SEP
+import ru.vldf.spider.SEP
 import codegen.recursiveFileFinder
 import codegen.runCodegenTest
 import com.google.gson.GsonBuilder
-import generators.descriptors.FileDescriptor
-import javaPath
-import kexIntrinsicsJarPath
-import kexJarPath
+import ru.vldf.spider.generators.descriptors.FileDescriptor
+import ru.vldf.spider.javaPath
+import ru.vldf.spider.kexIntrinsicsJarPath
+import ru.vldf.spider.kexJarPath
 import org.junit.jupiter.api.Assertions
-import runKex
+import ru.vldf.spider.programrunners.JavacRunner
+import ru.vldf.spider.runKex
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStreamReader
 
 private val testNameRegex = Regex("(testData\\/)(.+)(\\/)?")
-private val generatedCodeDir = ".${SEP}src${SEP}test${SEP}generated${SEP}"
-private val testDataBaseDir = ".${SEP}src${SEP}test${SEP}resources${SEP}testData${SEP}"
-private val testsBaseDir = ".${SEP}src${SEP}test${SEP}"
-private val tmpDir = ".${SEP}tmp${SEP}"
+private val generatedCodeDir = ".${SEP}src${SEP}test${SEP}generated$SEP"
+private val testDataBaseDir = ".${SEP}src${SEP}test${SEP}resources${SEP}testData$SEP"
+private val testsBaseDir = ".${SEP}src${SEP}test$SEP"
+private val tmpDir = ".${SEP}tmp$SEP"
 private val gson = GsonBuilder().setPrettyPrinting().create()
 /**
  * @param lslsPath: path to dir contains lsl files .../resources/testData/TEST_DIR/
@@ -67,7 +68,7 @@ fun runAnalysisTest(lslsPath: String) {
     val mainFile = recursiveFileFinder(clientSourceFiles).firstOrNull { it.name == "Main.java" }?.parentFile?.path
         ?: throw IllegalArgumentException("Testdata not contains Main.java")
     val mainFileJavaLikePath = mainFile
-        .removePrefix(clientSourceFiles.path+SEP)
+        .removePrefix(clientSourceFiles.path+ SEP)
         .replace(SEP, ".") + ".*"
 
     val libraryPackage = findLibraryPackage(librarySourceFiles)
@@ -147,7 +148,7 @@ private fun compileJavaClientSources(sourceCodeDir: File, libDir: File, resultDi
     val javacArgs = arrayOf(
         "${javaPath}javac",
         "-cp",
-        "${kexIntrinsicsJarPath};${libDir.absolutePath}",
+        "$kexIntrinsicsJarPath;${libDir.absolutePath}",
         "-sourcepath",
         sourceCodeDir.absolutePath,
         "-d",
@@ -169,30 +170,20 @@ private fun compileJavaClientSources(sourceCodeDir: File, libDir: File, resultDi
 private fun compileMockCode(codeFromDir: File, generatedFileNames: List<FileDescriptor>, basePath: String, target: File): Boolean {
     println("compiling the mock")
     deleteFilesThatNamesEqualsWithGenerated(generatedFileNames, target, basePath)
+
     val sourceFile = File(codeFromDir.absolutePath + SEP + "sources.txt").apply {
         parentFile.mkdirs()
         createNewFile()
         writeText(generatedFileNames.joinToString("\n") { it.fullPath })
     }
-    val javacArgs = arrayOf(
-        "${javaPath}javac",
-        "-cp",
-        "${kexIntrinsicsJarPath};${target}",  // todo: stupid windows
-        "-sourcepath",
-        codeFromDir.absolutePath,
-        "-verbose",
-        "-d",
-        "$target",
-        "@" + sourceFile.absolutePath
-    )
-    val pb = ProcessBuilder(*javacArgs)
-        .inheritIO()
-    val process = pb.start()
 
-
-    process.waitFor()
-
-    return process.exitValue() == 0
+    return JavacRunner()
+        .addArg("-cp", "$kexIntrinsicsJarPath;${target}")// todo: stupid windows
+        .addArg("-sourcepath", codeFromDir.absolutePath)
+        .addArg("-verbose")
+        .addArg("-d", target.toString())
+        .addArg("@" + sourceFile.absolutePath)
+        .runAndWait()
 }
 
 private fun deleteFilesThatNamesEqualsWithGenerated(fileDescriptors: List<FileDescriptor>, target: File, basePath: String) {

@@ -1,12 +1,12 @@
-package generators
+package ru.vldf.spider.generators
 
-import SEP
+import ru.vldf.spider.SEP
 import com.hendraanggrian.javapoet.buildJavaFile
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
-import exceptions.SemanticException
-import exceptions.UnknownStateException
-import generators.descriptors.FileDescriptor
+import ru.vldf.spider.exceptions.SemanticException
+import ru.vldf.spider.exceptions.UnknownStateException
+import ru.vldf.spider.generators.descriptors.FileDescriptor
 import ru.spbstu.insys.libsl.parser.Automaton
 import ru.spbstu.insys.libsl.parser.AutomatonVariableStatement
 import ru.spbstu.insys.libsl.parser.FunctionDecl

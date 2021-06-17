@@ -1,7 +1,9 @@
+package ru.vldf.spider
+
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import generators.Generator
-import generators.descriptors.FileDescriptor
+import ru.vldf.spider.generators.Generator
+import ru.vldf.spider.generators.descriptors.FileDescriptor
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.required
@@ -18,7 +20,7 @@ const val kexJarPath = "C:\\Users\\vladi\\IdeaProjects\\kex\\kex-runner\\target\
 const val kexBaseDir = "C:\\Users\\vladi\\IdeaProjects\\kex\\"
 
 fun main(args: Array<String>) {
-    val argParser = ArgParser("SPecification Based Integration Defect Reveler")
+    val argParser = ArgParser("SPecification Based Integration ru.vldf.spider.Defect Reveler")
     val lslPath by argParser.option(ArgType.String, "lsl", "i", "lsl file path").required()
     val jarPath by argParser.option(ArgType.String, "libJar", "j", "library jar file path")
     val libraryDirPath by argParser.option(ArgType.String, "libDir", "d", "library dir path")
@@ -59,7 +61,7 @@ fun main(args: Array<String>) {
 
 private fun unzipLibToPath(lib: File, target: File) {
     val jarArgs = arrayOf(
-        "${javaPath}/jar",
+        "$javaPath/jar",
         "-xf",
         target.path,
         lib.path
@@ -88,7 +90,7 @@ fun compileMockCode(codeFromDir: File, generatedFileNames: List<FileDescriptor>,
     val javacArgs = arrayOf(
         "${javaPath}javac",
         "-cp",
-        "${kexIntrinsicsJarPath}:${target}",
+        "$kexIntrinsicsJarPath:${target}",
         "-sourcepath",
         codeFromDir.absolutePath,
         "-d",

@@ -45,7 +45,7 @@ private fun generateTestFunction(name: String): String {
 }
 
 /*
-fun codegen.main() {
+fun codegen.ru.vldf.spider.main() {
     codegen.wipeTestDataAndGenerateAllFiles(PATH1)
     codegen.wipeTestDataAndGenerateAllFiles(PATH2)
     codegen.wipeTestDataAndGenerateAllFiles(PATH3)
@@ -56,7 +56,7 @@ private fun generateWiperFunction(names: List<String>): String {
     return buildString {
         appendLine("package codegen")
         appendLine()
-        appendLine("fun main() {")
+        appendLine("fun ru.vldf.spider.main() {")
 
         for (name in names) {
             append(" ".repeat(4))
