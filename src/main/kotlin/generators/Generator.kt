@@ -98,7 +98,7 @@ class Generator {
                     methods.add(method.name) {
                         modifiers.add(Modifier.PUBLIC)
                         if (method.requires != null) {
-                            appendLine("kexAssert(" + method.requires!!.toJava() + ")")
+                            appendLine("    %T.kexAssert(\"pre\", " + method.requires!!.toJava() + ")", kexIntrinsicsClassName)
                         }
 
                         val returnTypeName = typesAliases[method.returnValue?.type?.typeName]

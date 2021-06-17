@@ -12,8 +12,8 @@ import java.io.InputStreamReader
 
 val targetDir = File("./result/")
 val tmpDir = File("./tmp/")
-const val javaPath = "C:\\Program Files\\Java\\jdk-15.0.2\\bin"
-const val kexIntrinsicsJarPath = "/home/vldf/Desktop/kex-intrinsics-0.0.4.jar"
+const val javaPath = "C:\\Program Files\\Java\\jdk-15.0.2\\bin\\"
+const val kexIntrinsicsJarPath = "C:\\Users\\vladi\\Desktop\\kex-intrinsics-0.0.4.jar"
 const val kexJarPath = "C:\\Users\\vladi\\IdeaProjects\\kex\\kex-runner\\target\\kex-runner-0.0.1-jar-with-dependencies.jar"
 const val kexBaseDir = "C:\\Users\\vladi\\IdeaProjects\\kex\\"
 
@@ -138,7 +138,9 @@ fun runKex(kexPath: String, classPath: String, tmpDir: File, libraryTarget: Stri
         "--target",
         libraryTarget,
         "--log",
-        "kex.log"
+        "kex.log",
+        "--config",
+        "C:\\Users\\vladi\\IdeaProjects\\kex\\kex-test.ini"
     )
     val runtime = Runtime.getRuntime()
     val kexProcess = runtime.exec(kexArgs, null, workingDir)

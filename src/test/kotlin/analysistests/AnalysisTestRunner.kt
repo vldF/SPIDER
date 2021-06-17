@@ -1,5 +1,6 @@
 package analysistests
 
+import SEP
 import codegen.recursiveFileFinder
 import codegen.runCodegenTest
 import com.google.gson.GsonBuilder
@@ -15,10 +16,10 @@ import java.io.FileNotFoundException
 import java.io.InputStreamReader
 
 private val testNameRegex = Regex("(testData\\/)(.+)(\\/)?")
-private const val generatedCodeDir = "./src/test/generated/"
-private const val testDataBaseDir = "./src/test/resources/testData/"
-private const val testsBaseDir = "./src/test/"
-private const val tmpDir = "./tmp/"
+private val generatedCodeDir = ".${SEP}src${SEP}test${SEP}generated${SEP}"
+private val testDataBaseDir = ".${SEP}src${SEP}test${SEP}resources${SEP}testData${SEP}"
+private val testsBaseDir = ".${SEP}src${SEP}test${SEP}"
+private val tmpDir = ".${SEP}tmp${SEP}"
 private val gson = GsonBuilder().setPrettyPrinting().create()
 /**
  * @param lslsPath: path to dir contains lsl files .../resources/testData/TEST_DIR/
@@ -28,16 +29,16 @@ fun runAnalysisTest(lslsPath: String) {
     val testName = testNameRegex.find(lslsPath)?.groupValues?.get(2)
     val testGeneratedCodePath = "${generatedCodeDir}$testName"
     val generatedTestsFile = File(testGeneratedCodePath)
-    val clientSourceFiles = File("$testDataBaseDir$testName/java")
-    val librarySourceFiles = File("$testDataBaseDir$testName/javaLibrary")
-    var targetLibraryFile = File("$testDataBaseDir$testName/javaClasses")
+    val clientSourceFiles = File("$testDataBaseDir$testName${SEP}java")
+    val librarySourceFiles = File("$testDataBaseDir$testName${SEP}javaLibrary")
+    var targetLibraryFile = File("$testDataBaseDir$testName${SEP}javaClasses")
 
     if (!(generatedTestsFile.exists() && generatedTestsFile.isDirectory)) {
         runCodegenTest(lslsPath)
     }
 
     val generatedFileDescriptors = recursiveFileFinder(generatedTestsFile).map { file ->
-        FileDescriptor(file.parentFile.path + "/", file.nameWithoutExtension, file.extension)
+        FileDescriptor(file.parentFile.path + SEP, file.nameWithoutExtension, file.extension)
     }
     val targetFile = File(tmpDir + testName + "Client").apply { mkdirs() }
 
@@ -66,22 +67,24 @@ fun runAnalysisTest(lslsPath: String) {
     val mainFile = recursiveFileFinder(clientSourceFiles).firstOrNull { it.name == "Main.java" }?.parentFile?.path
         ?: throw IllegalArgumentException("Testdata not contains Main.java")
     val mainFileJavaLikePath = mainFile
-        .removePrefix(clientSourceFiles.path+"/")
-        .replace("/", ".") + ".*"
+        .removePrefix(clientSourceFiles.path+SEP)
+        .replace(SEP, ".") + ".*"
 
     val libraryPackage = findLibraryPackage(librarySourceFiles)
         ?: throw IllegalArgumentException("Missing library package")
 
+    println("running kex")
+
     runKex(
         kexJarPath,
-        classPath = targetLibraryFile.absolutePath + ":" + targetFile.absolutePath,
+        classPath = targetLibraryFile.absolutePath + ";" + targetFile.absolutePath,
         targetFile,
         "$libraryPackage.*",
         mainFileJavaLikePath
     )
 
-    val expectedResultFile = File(testsBaseDir + "analysistests/" + testName + ".json")
-    val actualResultFile = File(targetFile.canonicalPath + "/" + "defects.json")
+    val expectedResultFile = File(testsBaseDir + "analysistests$SEP" + testName + ".json")
+    val actualResultFile = File(targetFile.canonicalPath + SEP + "defects.json")
 
     val actualResult = gson.toJson(gson.fromJson(actualResultFile.readText(), Any::class.java))
     if (!expectedResultFile.exists()) {
@@ -109,7 +112,7 @@ private fun cleanTmp() {
 
 private fun compileJavaLibrarySources(sourceCodeDir: File, resultDir: File): Boolean {
     val sourceFiles = recursiveFileFinder(sourceCodeDir).map { it.absolutePath }
-    File(tmpDir + "javaLibrary" + "/" + "sources.txt").apply {
+    File(tmpDir + "javaLibrary" + SEP + "sources.txt").apply {
         parentFile.mkdirs()
         createNewFile()
         writeText(sourceFiles.joinToString("\n"))
@@ -120,7 +123,7 @@ private fun compileJavaLibrarySources(sourceCodeDir: File, resultDir: File): Boo
         sourceCodeDir.absolutePath,
         "-d",
         "$resultDir",
-        "@" + tmpDir + "javaLibrary" + "/" + "sources.txt"
+        "@" + tmpDir + "javaLibrary" + SEP + "sources.txt"
     )
     val runtime = Runtime.getRuntime()
     val javacProcess = runtime.exec(javacArgs)
@@ -136,7 +139,7 @@ private fun compileJavaLibrarySources(sourceCodeDir: File, resultDir: File): Boo
 
 private fun compileJavaClientSources(sourceCodeDir: File, libDir: File, resultDir: File): Boolean {
     val sourceFiles = recursiveFileFinder(sourceCodeDir).map { it.absolutePath }
-    File(tmpDir + "javaClient" + "/" + "sources.txt").apply {
+    File(tmpDir + "javaClient" + SEP + "sources.txt").apply {
         parentFile.mkdirs()
         createNewFile()
         writeText(sourceFiles.joinToString("\n"))
@@ -144,12 +147,12 @@ private fun compileJavaClientSources(sourceCodeDir: File, libDir: File, resultDi
     val javacArgs = arrayOf(
         "${javaPath}javac",
         "-cp",
-        "${kexIntrinsicsJarPath}:${libDir.absolutePath}",
+        "${kexIntrinsicsJarPath};${libDir.absolutePath}",
         "-sourcepath",
         sourceCodeDir.absolutePath,
         "-d",
         resultDir.absolutePath,
-        "@" + tmpDir + "javaClient" + "/" + "sources.txt"
+        "@" + tmpDir + "javaClient" + SEP + "sources.txt"
     )
     val runtime = Runtime.getRuntime()
     val javacProcess = runtime.exec(javacArgs)
@@ -164,8 +167,9 @@ private fun compileJavaClientSources(sourceCodeDir: File, libDir: File, resultDi
 }
 
 private fun compileMockCode(codeFromDir: File, generatedFileNames: List<FileDescriptor>, basePath: String, target: File): Boolean {
+    println("compiling the mock")
     deleteFilesThatNamesEqualsWithGenerated(generatedFileNames, target, basePath)
-    val sourceFile = File(codeFromDir.absolutePath + "/" + "sources.txt").apply {
+    val sourceFile = File(codeFromDir.absolutePath + SEP + "sources.txt").apply {
         parentFile.mkdirs()
         createNewFile()
         writeText(generatedFileNames.joinToString("\n") { it.fullPath })
@@ -173,30 +177,27 @@ private fun compileMockCode(codeFromDir: File, generatedFileNames: List<FileDesc
     val javacArgs = arrayOf(
         "${javaPath}javac",
         "-cp",
-        "${kexIntrinsicsJarPath}:${target}",
+        "${kexIntrinsicsJarPath};${target}",  // todo: stupid windows
         "-sourcepath",
         codeFromDir.absolutePath,
+        "-verbose",
         "-d",
         "$target",
         "@" + sourceFile.absolutePath
     )
-    val runtime = Runtime.getRuntime()
-    val javacProcess = runtime.exec(javacArgs)
-    javacProcess.waitFor()
-    val error = BufferedReader(InputStreamReader(javacProcess.errorStream)).readText()
-    val stdout = BufferedReader(InputStreamReader(javacProcess.inputStream)).readText()
-    if (error.isNotEmpty()) {
-        System.err.println("javac error: $error")
-        println("javac stdout: $stdout")
-        return false
-    }
+    val pb = ProcessBuilder(*javacArgs)
+        .inheritIO()
+    val process = pb.start()
 
-    return true
+
+    process.waitFor()
+
+    return process.exitValue() == 0
 }
 
 private fun deleteFilesThatNamesEqualsWithGenerated(fileDescriptors: List<FileDescriptor>, target: File, basePath: String) {
     for (descriptor in fileDescriptors) {
-        File(target.absolutePath + "/" + descriptor.fullPathWithoutExtension.removePrefix(basePath) + ".class").delete()
+        File(target.absolutePath + SEP + descriptor.fullPathWithoutExtension.removePrefix(basePath) + ".class").delete()
     }
 }
 

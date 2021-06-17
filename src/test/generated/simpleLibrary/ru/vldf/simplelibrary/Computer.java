@@ -26,7 +26,6 @@ public class Computer {
     }
 
     public void selectOS(String osName) {
-        kexAssert((osName != 1) || (osName != 1.0));
         if (STATE == STATE$CONST$Computer$BOOTED) {
             STATE = STATE$CONST$Computer$OSSELECTED;
         } else {
