@@ -15,14 +15,14 @@ public class Memory {
         } else if (STATE == STATE$CONST$Memory$OPEN) {
             STATE = STATE$CONST$Memory$CLOSE;
         } else {
-            Intrinsics.kexAssert("id3", false);
+            Intrinsics.kexAssert("id4", false);
         }
     }
 
     public void setOS(ru.vldf.simplelibrary.OS os) {
         if (STATE == STATE$CONST$Memory$OPEN) {
         } else {
-            Intrinsics.kexAssert("id4", false);
+            Intrinsics.kexAssert("id5", false);
         }
     }
 

@@ -31,7 +31,7 @@ dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
-    implementation("com.github.vldF:LibSLParser:77d49470")
+    implementation("com.github.vldF:LibSLParser:b202202")
     implementation("org.jetbrains.research:kex-intrinsics:0.0.3")
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
     implementation(kotlin("stdlib-jdk8"))

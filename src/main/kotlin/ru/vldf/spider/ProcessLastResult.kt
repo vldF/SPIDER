@@ -2,6 +2,8 @@ package ru.vldf.spider
 
 import ru.vldf.spider.generators.Generator
 import ru.spbstu.insys.libsl.parser.ModelParser
+import ru.vldf.spider.configs.targetDir
+import ru.vldf.spider.configs.tmpDir
 import java.io.File
 
 fun main() {

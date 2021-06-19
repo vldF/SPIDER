@@ -1,5 +1,6 @@
 package ru.vldf.spider.generators
 
+import com.hendraanggrian.javapoet.MethodSpecBuilder
 import ru.vldf.spider.SEP
 import com.hendraanggrian.javapoet.buildJavaFile
 import com.squareup.javapoet.ClassName
@@ -97,8 +98,8 @@ class Generator {
                     }
                     methods.add(method.name) {
                         modifiers.add(Modifier.PUBLIC)
-                        if (method.requires != null) {
-                            appendLine("    %T.kexAssert(\"pre\", " + method.requires!!.toJava() + ")", kexIntrinsicsClassName)
+                        if (method.contracts.requires != null) {
+                            appendKexAssert("Precondition '${method.contracts.requires}' is false", method.contracts.requires!!)
                         }
 
                         val returnTypeName = typesAliases[method.returnValue?.type?.typeName]
@@ -140,10 +141,8 @@ class Generator {
                                 appendLine("STATE = $transitionFromAnyToStateName")
                             } else {
                                 val errorMessage = "Invalid shift by calling method `${method.name}`"
-                                val errorId = "id${assertionId++}"
-                                errorIdMap[errorId] = errorMessage
-
-                                appendLine("    %T.kexAssert(\"$errorId\", false)", kexIntrinsicsClassName)
+                                this.append("    ") // due javapoet-ktx
+                                appendKexAssert(errorMessage, "false")
                             }
                             if (shiftsMap.size - anyTransitionCount > 0) {
                                 append("}\n")
@@ -163,6 +162,10 @@ class Generator {
                             }
                         }
 
+                        if (method.contracts.ensures != null) {
+                            appendKexAssert("Postcondition '${method.contracts.ensures}' is false", method.contracts.ensures!!)
+                        }
+
                         if (method.returnValue != null) {
                             appendLine("return org.jetbrains.research.kex.Objects.kexUnknown()")
                         }
@@ -171,6 +174,13 @@ class Generator {
                 }
             }
         }.toString()
+    }
+
+    private fun MethodSpecBuilder.appendKexAssert(errorMessage: String, condition: String) {
+        val errorId = "id${assertionId++}"
+        errorIdMap[errorId] = errorMessage
+
+        appendLine("%T.kexAssert(\"$errorId\", $condition)", kexIntrinsicsClassName)
     }
 
     private fun getAutomatonDefaultState(automaton: Automaton): String {

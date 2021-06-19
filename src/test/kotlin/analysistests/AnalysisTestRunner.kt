@@ -5,10 +5,8 @@ import codegen.recursiveFileFinder
 import codegen.runCodegenTest
 import com.google.gson.GsonBuilder
 import ru.vldf.spider.generators.descriptors.FileDescriptor
-import ru.vldf.spider.javaPath
-import ru.vldf.spider.kexIntrinsicsJarPath
-import ru.vldf.spider.kexJarPath
 import org.junit.jupiter.api.Assertions
+import ru.vldf.spider.configs.*
 import ru.vldf.spider.programrunners.JavacRunner
 import ru.vldf.spider.runKex
 import java.io.BufferedReader
@@ -78,7 +76,7 @@ fun runAnalysisTest(lslsPath: String) {
 
     runKex(
         kexJarPath,
-        classPath = targetLibraryFile.absolutePath + ";" + targetFile.absolutePath,
+        classPath = targetLibraryFile.absolutePath + ":" + targetFile.absolutePath,
         targetFile,
         "$libraryPackage.*",
         mainFileJavaLikePath
@@ -148,7 +146,7 @@ private fun compileJavaClientSources(sourceCodeDir: File, libDir: File, resultDi
     val javacArgs = arrayOf(
         "${javaPath}javac",
         "-cp",
-        "$kexIntrinsicsJarPath;${libDir.absolutePath}",
+        "$kexIntrinsicsJarPath:${libDir.absolutePath}",
         "-sourcepath",
         sourceCodeDir.absolutePath,
         "-d",
@@ -178,7 +176,7 @@ private fun compileMockCode(codeFromDir: File, generatedFileNames: List<FileDesc
     }
 
     return JavacRunner()
-        .addArg("-cp", "$kexIntrinsicsJarPath;${target}")// todo: stupid windows
+        .addArg("-cp", "$kexIntrinsicsJarPath:${target}")
         .addArg("-sourcepath", codeFromDir.absolutePath)
         .addArg("-verbose")
         .addArg("-d", target.toString())

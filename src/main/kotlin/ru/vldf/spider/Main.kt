@@ -8,16 +8,10 @@ import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.required
 import ru.spbstu.insys.libsl.parser.ModelParser
+import ru.vldf.spider.configs.*
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-
-val targetDir = File("./result/")
-val tmpDir = File("./tmp/")
-const val javaPath = "C:\\Program Files\\Java\\jdk-15.0.2\\bin\\"
-const val kexIntrinsicsJarPath = "C:\\Users\\vladi\\Desktop\\kex-intrinsics-0.0.4.jar"
-const val kexJarPath = "C:\\Users\\vladi\\IdeaProjects\\kex\\kex-runner\\target\\kex-runner-0.0.1-jar-with-dependencies.jar"
-const val kexBaseDir = "C:\\Users\\vladi\\IdeaProjects\\kex\\"
 
 fun main(args: Array<String>) {
     val argParser = ArgParser("SPecification Based Integration ru.vldf.spider.Defect Reveler")
@@ -142,7 +136,7 @@ fun runKex(kexPath: String, classPath: String, tmpDir: File, libraryTarget: Stri
         "--log",
         "kex.log",
         "--config",
-        "C:\\Users\\vladi\\IdeaProjects\\kex\\kex-test.ini"
+        "/home/vldf/IdeaProjects/kex/kex.ini"
     )
     val runtime = Runtime.getRuntime()
     val kexProcess = runtime.exec(kexArgs, null, workingDir)

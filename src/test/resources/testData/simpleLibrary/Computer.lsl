@@ -31,7 +31,7 @@ fun Computer.Computer(): Computer {
 fun Computer.boot();
 
 fun Computer.selectOS(osName: OSName) {
-    requires ("STATE" == 0);
+    requires (STATE == 0);
 }
 
 fun Computer.loadOS();

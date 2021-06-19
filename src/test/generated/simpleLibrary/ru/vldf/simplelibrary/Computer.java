@@ -26,10 +26,11 @@ public class Computer {
     }
 
     public void selectOS(String osName) {
+        Intrinsics.kexAssert("id1", (STATE == 0));
         if (STATE == STATE$CONST$Computer$BOOTED) {
             STATE = STATE$CONST$Computer$OSSELECTED;
         } else {
-            Intrinsics.kexAssert("id1", false);
+            Intrinsics.kexAssert("id2", false);
         }
     }
 
@@ -37,7 +38,7 @@ public class Computer {
         if (STATE == STATE$CONST$Computer$OSSELECTED) {
             STATE = STATE$CONST$Computer$OSLOADED;
         } else {
-            Intrinsics.kexAssert("id2", false);
+            Intrinsics.kexAssert("id3", false);
         }
     }
 
