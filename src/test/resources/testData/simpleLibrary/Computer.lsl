@@ -21,7 +21,7 @@ automaton Computer {
     shift Downed -> Booted(boot);
     shift Booted -> OSSelected(selectOS);
     shift OSSelected -> OSLoaded(loadOS);
-    shift Any -> Downed(shutdown);
+    shift Any -> Closed(shutdown);
 }
 
 fun Computer.Computer(): Computer {

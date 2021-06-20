@@ -12,6 +12,7 @@ import ru.spbstu.insys.libsl.parser.Automaton
 import ru.spbstu.insys.libsl.parser.AutomatonVariableStatement
 import ru.spbstu.insys.libsl.parser.FunctionDecl
 import ru.spbstu.insys.libsl.parser.LibraryDecl
+import ru.vldf.spider.configs.checkFinishstates
 import javax.lang.model.element.Modifier
 import kotlin.collections.set
 
@@ -20,6 +21,7 @@ class Generator {
     private val typesAliases = mutableMapOf<String, String>()
     private var assertionId = 0
     private val statesMap = mutableMapOf<String, Int>()
+    private val finishstates = mutableMapOf<Automaton, MutableList<String>>()
     val errorIdMap = mutableMapOf<String, String>()
 
     private val kexIntrinsicsClassName = ClassName.get("org.jetbrains.research.kex", "Intrinsics")
@@ -37,7 +39,7 @@ class Generator {
             typesAliases[type.semanticType.typeName] = type.codeType.typeName
         }
 
-        initStatesMap(library)
+        scanStates(library)
 
         val result = mutableMapOf<FileDescriptor, String>()
 
@@ -55,11 +57,15 @@ class Generator {
         return result
     }
 
-    private fun initStatesMap(library: LibraryDecl) {
+    private fun scanStates(library: LibraryDecl) {
         var i = 0
         for (automaton in library.automata) {
             automaton.states.forEach { state ->
-                statesMap[state.name.getStateName(automaton)] = ++i
+                val name = state.name.getStateName(automaton)
+                statesMap[name] = ++i
+                if (state.isFinish) {
+                    finishstates.putIfAbsent(automaton, mutableListOf(name))?.add(name)
+                }
             }
         }
     }
@@ -100,6 +106,13 @@ class Generator {
                         modifiers.add(Modifier.PUBLIC)
                         if (method.contracts.requires != null) {
                             appendKexAssert("Precondition '${method.contracts.requires}' is false", method.contracts.requires!!)
+                        }
+
+                        if (checkFinishstates && finishstates[automaton] != null) {
+                            appendKexAssert(
+                                "Shift from finishstate",
+                                finishstates[automaton]!!.joinToString(prefix = "STATE != ", separator = "||")
+                            )
                         }
 
                         val returnTypeName = typesAliases[method.returnValue?.type?.typeName]
