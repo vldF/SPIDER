@@ -18,7 +18,7 @@ private val testNameRegex = Regex("(testData\\/)(.+)(\\/)?")
 private val generatedCodeDir = ".${SEP}src${SEP}test${SEP}generated$SEP"
 private val testDataBaseDir = ".${SEP}src${SEP}test${SEP}resources${SEP}testData$SEP"
 private val testsBaseDir = ".${SEP}src${SEP}test$SEP"
-private val tmpDir = ".${SEP}tmp$SEP"
+private val tmpDir = ru.vldf.spider.configs.tmpDir.absolutePath + SEP
 private val gson = GsonBuilder().setPrettyPrinting().create()
 /**
  * @param lslsPath: path to dir contains lsl files .../resources/testData/TEST_DIR/

@@ -24,10 +24,12 @@ public class Computer {
         } else {
             Intrinsics.kexAssert("id1", false);
         }
+        memory = new Memory();
+        memory.STATE = 6;
     }
 
     public void selectOS(String osName) {
-        Intrinsics.kexAssert("id2", (STATE == 0));
+        Intrinsics.kexAssert("id2", (osName == "win" || osName == "linux") && memory != null);
         Intrinsics.kexAssert("id3", STATE != STATE$CONST$Computer$CLOSED);
         if (STATE == STATE$CONST$Computer$BOOTED) {
             STATE = STATE$CONST$Computer$OSSELECTED;
@@ -48,11 +50,5 @@ public class Computer {
     public void shutdown() {
         Intrinsics.kexAssert("id7", STATE != STATE$CONST$Computer$CLOSED);
         STATE = STATE$CONST$Computer$CLOSED;
-    }
-
-    public void addMemory() {
-        Intrinsics.kexAssert("id8", STATE != STATE$CONST$Computer$CLOSED);
-        memory = new Memory();
-        memory.STATE = 6;
     }
 }

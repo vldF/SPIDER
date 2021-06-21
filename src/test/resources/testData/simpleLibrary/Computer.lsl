@@ -28,19 +28,17 @@ fun Computer.Computer(): Computer {
     result = new Computer(Downed);
 }
 
-fun Computer.boot();
+fun Computer.boot(){
+    memory = new Memory(Close);
+}
 
 fun Computer.selectOS(osName: OSName) {
-    requires (STATE == 0);
+    requires (osName == "win" || osName == "linux") && memory != null; // memory is Computer's property
 }
 
 fun Computer.loadOS();
 
 fun Computer.shutdown();
-
-fun Computer.addMemory() {
-    memory = new Memory(Close);
-} // todo: add another one automaton
 
 automaton Memory {
     javapackage ru.vldf.simplelibrary;

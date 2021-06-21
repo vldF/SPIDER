@@ -12,15 +12,7 @@ public class RequestBuilder {
     public int STATE = STATE$CONST$RequestBuilder$CREATED;
 
     public okhttp3.Request.Builder url(String urlValue) {
-        if (STATE == STATE$CONST$RequestBuilder$CREATED) {
-            STATE = STATE$CONST$RequestBuilder$URLSET;
-        } else {
-            Intrinsics.kexAssert("id0", false);
-        }
-        return org.jetbrains.research.kex.Objects.kexUnknown();
-    }
-
-    public okhttp3.Request.Builder url(okhttp3.HttpUrl urlValue) {
+        Intrinsics.kexAssert("id0", STATE != STATE$CONST$RequestBuilder$BUILT);
         if (STATE == STATE$CONST$RequestBuilder$CREATED) {
             STATE = STATE$CONST$RequestBuilder$URLSET;
         } else {
@@ -29,11 +21,22 @@ public class RequestBuilder {
         return org.jetbrains.research.kex.Objects.kexUnknown();
     }
 
+    public okhttp3.Request.Builder url(okhttp3.HttpUrl urlValue) {
+        Intrinsics.kexAssert("id2", STATE != STATE$CONST$RequestBuilder$BUILT);
+        if (STATE == STATE$CONST$RequestBuilder$CREATED) {
+            STATE = STATE$CONST$RequestBuilder$URLSET;
+        } else {
+            Intrinsics.kexAssert("id3", false);
+        }
+        return org.jetbrains.research.kex.Objects.kexUnknown();
+    }
+
     public okhttp3.Request build() {
+        Intrinsics.kexAssert("id4", STATE != STATE$CONST$RequestBuilder$BUILT);
         if (STATE == STATE$CONST$RequestBuilder$URLSET) {
             STATE = STATE$CONST$RequestBuilder$BUILT;
         } else {
-            Intrinsics.kexAssert("id2", false);
+            Intrinsics.kexAssert("id5", false);
         }
         result = new Request();
         result.STATE = 4;
