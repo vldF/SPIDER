@@ -2,13 +2,14 @@ package ru.vldf.spider
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import ru.vldf.spider.generators.Generator
 import ru.vldf.spider.generators.descriptors.FileDescriptor
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.required
 import ru.spbstu.insys.libsl.parser.ModelParser
 import ru.vldf.spider.configs.*
+import ru.vldf.spider.generators.SynthContext
+import ru.vldf.spider.generators.SynthesizerPipelineBuilder
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -26,8 +27,8 @@ fun main(args: Array<String>) {
     val stream = File(lslPath).inputStream()
     val parsed = parser.parse(stream)
 
-    val codeGenerator = Generator()
-    val generatedCodeFiles = codeGenerator.generateCode(parsed)
+    val codeSynthesizer = SynthesizerPipelineBuilder().build(parsed)
+    val generatedContext = codeSynthesizer.generateCode()
     targetDir.deleteRecursively()
     targetDir.mkdirs()
 
@@ -44,13 +45,13 @@ fun main(args: Array<String>) {
             System.err.println("You must specify libJar or libDir")
         }
     }
-    saveGeneratedCodeToFile(generatedCodeFiles, saveToFile = tmpDir)
-    compileMockCode(codeFromDir = tmpDir, generatedFileNames = generatedCodeFiles.keys.toList(), targetDir)
+    saveGeneratedCodeToFile(generatedContext.result, saveToFile = tmpDir)
+    compileMockCode(codeFromDir = tmpDir, generatedFileNames = generatedContext.result.keys.toList(), targetDir)
 
     println("the code was instrumented")
     println("running KEX...")
     runKex(kexJarPath, classPath = targetDir.absolutePath, tmpDir, targetPackage, libraryPackage)
-    processKexResult(File(tmpDir.absolutePath + "/defects.json"), codeGenerator, targetDir.absolutePath)
+    processKexResult(File(tmpDir.absolutePath + "/defects.json"), generatedContext, targetDir.absolutePath)
 }
 
 private fun unzipLibToPath(lib: File, target: File) {
@@ -144,7 +145,7 @@ fun runKex(kexPath: String, classPath: String, tmpDir: File, libraryTarget: Stri
     kexProcess.printOutput()
 }
 
-fun processKexResult(defectFile: File, codeGenerator: Generator, basePath: String) {
+fun processKexResult(defectFile: File, codeGenerator: SynthContext, basePath: String) {
     val gson = Gson()
     val defectsArrayType = (object : TypeToken<Array<Defect>>() {}).type
     val report: Array<Defect> = gson.fromJson<Array<Defect>>(defectFile.readText(), defectsArrayType)

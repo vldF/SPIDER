@@ -1,9 +1,9 @@
 package ru.vldf.spider
 
-import ru.vldf.spider.generators.Generator
 import ru.spbstu.insys.libsl.parser.ModelParser
 import ru.vldf.spider.configs.targetDir
 import ru.vldf.spider.configs.tmpDir
+import ru.vldf.spider.generators.SynthesizerPipelineBuilder
 import java.io.File
 
 fun main() {
@@ -11,7 +11,7 @@ fun main() {
     val parser = ModelParser()
     val stream = File(lslPath).inputStream()
     val parsed = parser.parse(stream)
-    val codeGenerator = Generator()
-    codeGenerator.generateCode(parsed)
-    processKexResult(File(tmpDir.absolutePath + "/defects.json"), codeGenerator, targetDir.absolutePath)
+    val codeSynthesizer = SynthesizerPipelineBuilder().build(parsed)
+    val generatedContext = codeSynthesizer.generateCode()
+    processKexResult(File(tmpDir.absolutePath + "/defects.json"), generatedContext, targetDir.absolutePath)
 }

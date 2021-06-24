@@ -1,5 +1,5 @@
 package ru.vldf.spider.generators
-
+/*
 import com.hendraanggrian.javapoet.MethodSpecBuilder
 import ru.vldf.spider.SEP
 import com.hendraanggrian.javapoet.buildJavaFile
@@ -222,3 +222,5 @@ class Generator {
     private val String.withoutDoubleDollar: String
         get() = this.replace("\$\$", "\$")
 }
+
+*/

@@ -13,42 +13,42 @@ public class Computer {
 
     private final int STATE$CONST$Computer$CLOSED = 4;
 
-    public Memory memory;
+    public int STATE;
 
-    public int STATE = STATE$CONST$Computer$DOWNED;
+    public ru.vldf.simplelibrary.Memory memory;
 
     public void boot() {
-        Intrinsics.kexAssert("id0", STATE != STATE$CONST$Computer$CLOSED);
+        Intrinsics.kexAssert("id1", STATE != STATE$CONST$Computer$CLOSED);
         if (STATE == STATE$CONST$Computer$DOWNED) {
             STATE = STATE$CONST$Computer$BOOTED;
         } else {
-            Intrinsics.kexAssert("id1", false);
+            Intrinsics.kexAssert("id5", false);
         }
         memory = new Memory();
         memory.STATE = 6;
     }
 
     public void selectOS(String osName) {
-        Intrinsics.kexAssert("id2", (osName == "win" || osName == "linux") && memory != null);
-        Intrinsics.kexAssert("id3", STATE != STATE$CONST$Computer$CLOSED);
+        Intrinsics.kexAssert("id0", (osName == "win" || osName == "linux") && memory != null);
+        Intrinsics.kexAssert("id2", STATE != STATE$CONST$Computer$CLOSED);
         if (STATE == STATE$CONST$Computer$BOOTED) {
             STATE = STATE$CONST$Computer$OSSELECTED;
-        } else {
-            Intrinsics.kexAssert("id4", false);
-        }
-    }
-
-    public void loadOS() {
-        Intrinsics.kexAssert("id5", STATE != STATE$CONST$Computer$CLOSED);
-        if (STATE == STATE$CONST$Computer$OSSELECTED) {
-            STATE = STATE$CONST$Computer$OSLOADED;
         } else {
             Intrinsics.kexAssert("id6", false);
         }
     }
 
+    public void loadOS() {
+        Intrinsics.kexAssert("id3", STATE != STATE$CONST$Computer$CLOSED);
+        if (STATE == STATE$CONST$Computer$OSSELECTED) {
+            STATE = STATE$CONST$Computer$OSLOADED;
+        } else {
+            Intrinsics.kexAssert("id7", false);
+        }
+    }
+
     public void shutdown() {
-        Intrinsics.kexAssert("id7", STATE != STATE$CONST$Computer$CLOSED);
+        Intrinsics.kexAssert("id4", STATE != STATE$CONST$Computer$CLOSED);
         STATE = STATE$CONST$Computer$CLOSED;
     }
 }

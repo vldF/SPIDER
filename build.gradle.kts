@@ -36,7 +36,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.1")
     implementation(kotlin("stdlib-jdk8"))
     implementation("com.google.code.gson:gson:2.8.6")
-    implementation("com.hendraanggrian:javapoet-ktx:0.8")
+    implementation("com.squareup:javapoet:1.13.0")
 }
 
 tasks.test {

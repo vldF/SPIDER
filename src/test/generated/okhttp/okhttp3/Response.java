@@ -7,17 +7,17 @@ public class Response {
 
     private final int STATE$CONST$Response$CLOSED = 1;
 
-    public int STATE = STATE$CONST$Response$CREATED;
+    public int STATE;
 
     public okhttp3.ResponseBody body() {
-        Intrinsics.kexAssert("id6", STATE != STATE$CONST$Response$CLOSED);
-        result = new ResponseBody();
-        result.STATE = 8;
-        return org.jetbrains.research.kex.Objects.kexUnknown();
+        Intrinsics.kexAssert("id3", STATE != STATE$CONST$Response$CLOSED);
+        ResponseBody tmpRes = new ResponseBody();
+        tmpRes.STATE = 8;
+        return tmpRes;
     }
 
     public void close() {
-        Intrinsics.kexAssert("id7", STATE != STATE$CONST$Response$CLOSED);
+        Intrinsics.kexAssert("id4", STATE != STATE$CONST$Response$CLOSED);
         STATE = STATE$CONST$Response$CLOSED;
     }
 }

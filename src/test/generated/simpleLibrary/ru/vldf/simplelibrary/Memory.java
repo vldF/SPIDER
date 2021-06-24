@@ -1,13 +1,14 @@
 package ru.vldf.simplelibrary;
 
 import org.jetbrains.research.kex.Intrinsics;
+import org.jetbrains.research.kex.Objects;
 
 public class Memory {
     private final int STATE$CONST$Memory$CLOSE = 0;
 
     private final int STATE$CONST$Memory$OPEN = 1;
 
-    public int STATE = STATE$CONST$Memory$CLOSE;
+    public int STATE;
 
     public void open() {
         if (STATE == STATE$CONST$Memory$CLOSE) {
@@ -27,7 +28,7 @@ public class Memory {
     }
 
     public ru.vldf.simplelibrary.OS getOS() {
-        return org.jetbrains.research.kex.Objects.kexUnknown();
+        return Objects.kexUnknown();
     }
 
     public void close() {

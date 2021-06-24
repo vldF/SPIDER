@@ -1,9 +1,9 @@
 package codegen
 
 import ru.vldf.spider.SEP
-import ru.vldf.spider.generators.Generator
 import org.junit.jupiter.api.Assertions
 import ru.spbstu.insys.libsl.parser.ModelParser
+import ru.vldf.spider.generators.SynthesizerPipelineBuilder
 import java.io.File
 
 private val basePath = ".${SEP}src${SEP}test${SEP}generated$SEP" // / in the end of path is important
@@ -18,7 +18,11 @@ fun runCodegenTest(dirPath: String, throwException: Boolean = true) {
     val stream = lslFile.inputStream()
     val parsed = parser.parse(stream)
 
-    val generated = Generator().generateCode(parsed).entries.associate { it.key.fullPathWithoutExtension to it.value }
+    val synthContext = SynthesizerPipelineBuilder().build(parsed).generateCode()
+    val generated = synthContext
+        .result
+        .entries
+        .associate { it.key.fullPathWithoutExtension to it.value }
 
     val oldTestFile = File("$basePath$testName")
     if (!oldTestFile.exists()) {
@@ -75,8 +79,9 @@ fun wipeTestDataAndGenerateAllFiles(dirPath: String) {
     val stream = lslFile.inputStream()
     val parsed = parser.parse(stream)
 
-    val generated = Generator()
-        .generateCode(parsed)
+    val synthContext = SynthesizerPipelineBuilder().build(parsed).generateCode()
+    val generated = synthContext
+        .result
         .entries
         .associate { it.key.fullPathWithoutExtension to it.value }
 

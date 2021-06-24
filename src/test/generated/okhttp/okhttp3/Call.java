@@ -7,17 +7,17 @@ public class Call {
 
     private final int STATE$CONST$Call$EXECUTED = 1;
 
-    public int STATE = STATE$CONST$Call$CREATED;
+    public int STATE;
 
     public okhttp3.Response execute() {
-        Intrinsics.kexAssert("id9", STATE != STATE$CONST$Call$EXECUTED);
+        Intrinsics.kexAssert("id6", STATE != STATE$CONST$Call$EXECUTED);
         if (STATE == STATE$CONST$Call$CREATED) {
             STATE = STATE$CONST$Call$EXECUTED;
         } else {
             Intrinsics.kexAssert("id10", false);
         }
-        result = new Response();
-        result.STATE = 6;
-        return org.jetbrains.research.kex.Objects.kexUnknown();
+        Response tmpRes = new Response();
+        tmpRes.STATE = 6;
+        return tmpRes;
     }
 }
