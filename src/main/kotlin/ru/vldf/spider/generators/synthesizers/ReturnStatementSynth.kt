@@ -6,6 +6,9 @@ import ru.vldf.spider.generators.SynthContext
 class ReturnStatementSynth : SynthesizerInterface {
     override fun generate(ctx: SynthContext, library: LibraryDecl) {
         for ((function, javaMethod) in ctx.functionToJavaMethod) {
+            if (function.isConstructor) {
+                continue
+            }
             if (function.returnValue != null) {
                 val resultAssignments = function.variableAssignments.filter { it.name == "result" }
                 when {

@@ -6,6 +6,7 @@ import java.io.FileNotFoundException
 open class ProgramsRunner(programPath: String) {
     private val args = mutableListOf<String>()
     private lateinit var process: Process
+    protected open val workingDir: File? = null
 
     init {
         if (!File(programPath).exists()) {
@@ -40,8 +41,12 @@ open class ProgramsRunner(programPath: String) {
         return this
     }
 
+    open fun beforeRun() {}
+
     fun runAndWait(): Boolean {
+        beforeRun()
         process = ProcessBuilder(args)
+            .directory(workingDir)
             .inheritIO()
             .start()
         process.waitFor()

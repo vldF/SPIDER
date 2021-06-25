@@ -12,6 +12,14 @@ public class RequestBuilder {
 
     public int STATE;
 
+    public RequestBuilder() {
+        STATE = STATE$CONST$RequestBuilder$CREATED;
+    }
+
+    public RequestBuilder() {
+        STATE = STATE$CONST$RequestBuilder$CREATED;
+    }
+
     public okhttp3.Request.Builder url(String urlValue) {
         Intrinsics.kexAssert("id0", STATE != STATE$CONST$RequestBuilder$BUILT);
         if (STATE == STATE$CONST$RequestBuilder$CREATED) {

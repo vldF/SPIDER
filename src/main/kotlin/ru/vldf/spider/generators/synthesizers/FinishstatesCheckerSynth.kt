@@ -11,7 +11,7 @@ class FinishstatesCheckerSynth : SynthesizerInterface {
                 continue
             }
             val functions = ctx.functionsByAutomaton[automaton].orEmpty()
-            for (method in functions.map { ctx.functionToJavaMethod[it] }) {
+            for (method in functions.filter { !it.isConstructor }.map { ctx.functionToJavaMethod[it] }) {
                 method?.apply {
                     val condition = finishstates.joinToString(prefix = "STATE != ", separator = "||") { it.name.getStateName(automaton) }
                     addKexAssert("Shift from finishstate: $condition", condition, ctx)

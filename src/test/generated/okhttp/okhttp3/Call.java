@@ -9,6 +9,10 @@ public class Call {
 
     public int STATE;
 
+    public Call() {
+        STATE = STATE$CONST$Call$CREATED;
+    }
+
     public okhttp3.Response execute() {
         Intrinsics.kexAssert("id6", STATE != STATE$CONST$Call$EXECUTED);
         if (STATE == STATE$CONST$Call$CREATED) {

@@ -3,6 +3,8 @@ package ru.vldf.spider.generators.synthesizers
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
 import ru.spbstu.insys.libsl.parser.Automaton
+import ru.spbstu.insys.libsl.parser.FunctionDecl
+import ru.spbstu.insys.libsl.parser.SemanticType
 import ru.vldf.spider.generators.SynthContext
 
 private val kexIntrinsicsClassName = ClassName.get("org.jetbrains.research.kex", "Intrinsics")!!
@@ -30,4 +32,11 @@ fun MethodSpec.Builder.addKexAssert(errorMessage: String, condition: String, ctx
     ctx.errorIdMap[errorId] = errorMessage
 
     addStatement("\$T.kexAssert(\"$errorId\", $condition)", kexIntrinsicsClassName)
+}
+
+val FunctionDecl.isConstructor: Boolean
+    get() = entity.type.typeName == name
+
+fun SemanticType.toJavaType(ctx: SynthContext): ClassName {
+    return ClassName.get("", ctx.typesAliases[typeName])
 }

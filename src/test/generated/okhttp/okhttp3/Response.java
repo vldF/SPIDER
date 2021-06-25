@@ -9,6 +9,10 @@ public class Response {
 
     public int STATE;
 
+    public Response() {
+        STATE = STATE$CONST$Response$CREATED;
+    }
+
     public okhttp3.ResponseBody body() {
         Intrinsics.kexAssert("id3", STATE != STATE$CONST$Response$CLOSED);
         ResponseBody tmpRes = new ResponseBody();

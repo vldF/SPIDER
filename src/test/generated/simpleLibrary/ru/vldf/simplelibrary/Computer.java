@@ -17,6 +17,10 @@ public class Computer {
 
     public ru.vldf.simplelibrary.Memory memory;
 
+    public Computer() {
+        STATE = STATE$CONST$Computer$DOWNED;
+    }
+
     public void boot() {
         Intrinsics.kexAssert("id1", STATE != STATE$CONST$Computer$CLOSED);
         if (STATE == STATE$CONST$Computer$DOWNED) {

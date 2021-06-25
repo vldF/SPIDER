@@ -1,8 +1,28 @@
 [
   {
     "callStack": [
-      "ru/vldf/simplelibrary/Computer::boot(): void - ru/vldf/simplelibrary/Computer.java:21",
-      "ru/vldf/client/Main::main(java/lang/String[]): void - ru/vldf/client/Main.java:23"
+      "ru/vldf/simplelibrary/Computer::boot(): void - ru/vldf/simplelibrary/Computer.java:25",
+      "ru/vldf/client/Main::main(java/lang/String[]): void - ru/vldf/client/Main.java:22"
+    ],
+    "id": "id1",
+    "testCaseName": "testAssertion0",
+    "testFile": {},
+    "type": "ASSERT"
+  },
+  {
+    "callStack": [
+      "ru/vldf/simplelibrary/Computer::boot(): void - ru/vldf/simplelibrary/Computer.java:29",
+      "ru/vldf/client/Main::main(java/lang/String[]): void - ru/vldf/client/Main.java:22"
+    ],
+    "id": "id5",
+    "testCaseName": "testAssertion1",
+    "testFile": {},
+    "type": "ASSERT"
+  },
+  {
+    "callStack": [
+      "ru/vldf/simplelibrary/Computer::selectOS(java/lang/String): void - ru/vldf/simplelibrary/Computer.java:36",
+      "ru/vldf/client/Main::main(java/lang/String[]): void - ru/vldf/client/Main.java:27"
     ],
     "id": "id0",
     "testCaseName": "testAssertion0",
@@ -11,30 +31,10 @@
   },
   {
     "callStack": [
-      "ru/vldf/simplelibrary/Computer::boot(): void - ru/vldf/simplelibrary/Computer.java:25",
-      "ru/vldf/client/Main::main(java/lang/String[]): void - ru/vldf/client/Main.java:23"
+      "ru/vldf/simplelibrary/Computer::loadOS(): void - ru/vldf/simplelibrary/Computer.java:50",
+      "ru/vldf/client/Main::main(java/lang/String[]): void - ru/vldf/client/Main.java:16"
     ],
-    "id": "id1",
-    "testCaseName": "testAssertion1",
-    "testFile": {},
-    "type": "ASSERT"
-  },
-  {
-    "callStack": [
-      "ru/vldf/simplelibrary/Computer::selectOS(java/lang/String): void - ru/vldf/simplelibrary/Computer.java:32",
-      "ru/vldf/client/Main::main(java/lang/String[]): void - ru/vldf/client/Main.java:28"
-    ],
-    "id": "id2",
-    "testCaseName": "testAssertion0",
-    "testFile": {},
-    "type": "ASSERT"
-  },
-  {
-    "callStack": [
-      "ru/vldf/simplelibrary/Computer::loadOS(): void - ru/vldf/simplelibrary/Computer.java:46",
-      "ru/vldf/client/Main::main(java/lang/String[]): void - ru/vldf/client/Main.java:17"
-    ],
-    "id": "id6",
+    "id": "id7",
     "testCaseName": "testAssertion0",
     "testFile": {},
     "type": "ASSERT"

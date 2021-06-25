@@ -14,6 +14,7 @@ class SynthesizerPipelineBuilder {
         FinishstatesCheckerSynth(),
         ShiftsSynth(),
         FunctionPropertySynth(),
+        ConstructorsSynth(),
         EnsuresSynth(),
         ReturnStatementSynth(),
 

@@ -74,13 +74,17 @@ fun runAnalysisTest(lslsPath: String) {
 
     println("running kex")
 
-    runKex(
+    val resKex = runKex(
         kexJarPath,
         classPath = targetLibraryFile.absolutePath + ":" + targetFile.absolutePath,
         targetFile,
         "$libraryPackage.*",
         mainFileJavaLikePath
     )
+
+    if (!resKex) {
+        throw IllegalArgumentException("Kex error")
+    }
 
     val expectedResultFile = File(testsBaseDir + "analysistests$SEP" + testName + ".json")
     val actualResultFile = File(targetFile.canonicalPath + SEP + "defects.json")

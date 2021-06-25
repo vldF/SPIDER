@@ -10,6 +10,10 @@ public class Memory {
 
     public int STATE;
 
+    public Memory() {
+        STATE = STATE$CONST$Memory$CLOSE;
+    }
+
     public void open() {
         if (STATE == STATE$CONST$Memory$CLOSE) {
             STATE = STATE$CONST$Memory$OPEN;

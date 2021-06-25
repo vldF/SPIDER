@@ -10,6 +10,7 @@ import ru.spbstu.insys.libsl.parser.ModelParser
 import ru.vldf.spider.configs.*
 import ru.vldf.spider.generators.SynthContext
 import ru.vldf.spider.generators.SynthesizerPipelineBuilder
+import ru.vldf.spider.programrunners.KexRunner
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -113,36 +114,10 @@ private fun deleteFilesThatNamesEqualsWithGenerated(fileDescriptors: List<FileDe
     --libCheck ru.vldf.testlibrary.*
     --log vldf.log
  */
-fun runKex(kexPath: String, classPath: String, tmpDir: File, libraryTarget: String, clientTarget: String) {
+fun runKex(kexPath: String, classPath: String, tmpDir: File, libraryTarget: String, clientTarget: String): Boolean {
     val workingDir = File(kexBaseDir)
-    val kexArgs = arrayOf(
-        "$javaPath/java",
-        "-Xmx16384m",
-        "-Djava.security.manager",
-        "-Djava.security.policy==kex.policy",
-        "-jar",
-        kexPath,
-        "--classpath",
-        classPath,
-        "--output",
-        "kex-instrumented",
-        "--mode",
-        "libchecker",
-        "--libCheck",
-        clientTarget,
-        "--option",
-        "defect:outputFile:${tmpDir.absolutePath}/defects.json",
-        "--target",
-        libraryTarget,
-        "--log",
-        "kex.log",
-        "--config",
-        "/home/vldf/IdeaProjects/kex/kex.ini"
-    )
-    val runtime = Runtime.getRuntime()
-    val kexProcess = runtime.exec(kexArgs, null, workingDir)
-    kexProcess.waitFor()
-    kexProcess.printOutput()
+    return KexRunner(workingDir, kexPath, classPath, clientTarget, libraryTarget, tmpDir)
+        .runAndWait()
 }
 
 fun processKexResult(defectFile: File, codeGenerator: SynthContext, basePath: String) {

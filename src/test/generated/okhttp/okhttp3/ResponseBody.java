@@ -10,6 +10,10 @@ public class ResponseBody {
 
     public int STATE;
 
+    public ResponseBody() {
+        STATE = STATE$CONST$ResponseBody$CREATED;
+    }
+
     public String string() {
         Intrinsics.kexAssert("id5", STATE != STATE$CONST$ResponseBody$RESULTRETRIEVED);
         STATE = STATE$CONST$ResponseBody$RESULTRETRIEVED;

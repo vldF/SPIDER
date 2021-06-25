@@ -6,6 +6,9 @@ import ru.vldf.spider.generators.SynthContext
 class FunctionPropertySynth : SynthesizerInterface {
     override fun generate(ctx: SynthContext, library: LibraryDecl) {
         for ((function, javaMethod) in ctx.functionToJavaMethod) {
+            if (function.isConstructor) {
+                continue
+            }
             for (assignment in function.variableAssignments) {
                 val name = assignment.name
                 if (name == "result") {
